@@ -1,0 +1,25 @@
+{% load bootstrap5 %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor</title>
+    {% bootstrap_css %}
+</head>
+<body>
+    <div class="container">
+        <h1>Leitor</h1>
+        {% bootstrap_messages %}
+        <form method="post" class="form" autocomplete="off" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-dark"> Cadastrar </button>
+            {% endbuttons %}
+        </form>
+    </div>
+    {% bootstrap_javascript %}
+</body>
+</html>
