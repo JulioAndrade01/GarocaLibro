@@ -76,12 +76,20 @@ WSGI_APPLICATION = 'library_manager.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-#Utilisando postgresql para o projeto
+
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR/'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'DJANGO_G',
+        'USER':'djangoadmin',
+        'PASSWORD':'100902',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS' : {
+        'charset':'utf8mb4',
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+         }
     }
 }
 
@@ -110,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'America/Belem'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
