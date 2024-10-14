@@ -17,8 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from core.views import IndexView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
+    path('', IndexView.as_view(), name='home'),  # Definindo a URL 'home'
+    path('core/', include('core.urls')),  # Incluindo as URLs do app core sob o prefixo 'core/'
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

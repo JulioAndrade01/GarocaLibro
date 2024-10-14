@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livros Disponíveis</title>
+</head>
+<body>
+    <h1>Livros Disponíveis</h1>
+
+    <ul>
+        {% for livro in livros %}
+            <li>{{ livro.nome }} - {{ livro.autor }} ({{ livro.categoria }})</li>
+        {% empty %}
+            <li>Não há livros disponíveis no momento.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Cadastrar Empréstimo</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Cadastrar Empréstimo</button>
+    </form>
+
+    <a href="{% url 'index' %}">Voltar para Home</a>
+</body>
+</html>

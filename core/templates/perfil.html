@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Leitor</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Perfil do Leitor</h1>
+            <nav>
+                <ul>
+                    <li><a href="#perfil">Meu Perfil</a></li>
+                    <li><a href="#editar">Editar Perfil</a></li>
+                    <li><a href="/reservas" id="reserva-button">Reservas de Livros</a></li>
+
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="perfil">
+                <h2>Informações do Perfil</h2>
+                <div class="perfil-info">
+                    <div class="foto-container">
+                        {% if leitor.foto_perfil %}
+                            <img id="foto-perfil" src="{{ leitor.foto_perfil.url }}" alt="Foto de Perfil" class="foto-perfil">
+                        {% else %}
+                            <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="foto-perfil">
+                        {% endif %}
+                    </div>
+                    <div class="informacoes">
+                        <p><strong>Nome:</strong> <span id="nome-leitor">{{ leitor.nome }}</span></p>
+                        <p><strong>Email:</strong> <span id="email-leitor">{{ leitor.email }}</span></p>
+                        <p><strong>Telefone:</strong> <span id="telefone-leitor">{{ leitor.telefone }}</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="editar">
+                <h2>Editar Perfil</h2>
+                <form id="form-editar" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" name="nome" required value="{{ leitor.nome }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required value="{{ leitor.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefone">Telefone:</label>
+                        <input type="text" id="telefone" name="telefone" required value="{{ leitor.telefone }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="foto">Foto de Perfil:</label>
+                        <input type="file" id="foto" name="foto" accept="image/*">
+                    </div>
+                    <button type="submit">Salvar Alterações</button>
+                </form>
+            </section>
+
+            <section id="logout">
+                <button id="logout-button">Sair</button>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        async function buscarDadosLeitor() {
+            try {
+                const response = await fetch('/api/leitor/');
+                const leitor = await response.json();
+
+                if (leitor) {
+                    document.getElementById("nome-leitor").textContent = leitor.nome;
+                    document.getElementById("email-leitor").textContent = leitor.email;
+                    document.getElementById("telefone-leitor").textContent = leitor.telefone;
+                    document.getElementById("foto-perfil").src = leitor.foto_perfil ? leitor.foto_perfil : '{% static "default-profile.png" %}';
+                }
+            } catch (error) {
+                console.error("Erro ao buscar dados do leitor:", error);
+            }
+        }
+
+        window.onload = buscarDadosLeitor;
+
+        document.getElementById("logout-button").addEventListener("click", function() {
+            window.location.href = "/logout"; 
+        });
+    </script>
+</body>
+</html>

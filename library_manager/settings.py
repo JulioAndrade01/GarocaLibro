@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -23,10 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%tt)f9t-4c-#*eq-&a8==9r)m47sr%nck^4s_o$ngn2^xs#=wh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # Adicione outros hosts permitidos aqui, se necessário.
 
 # Application definition
 
@@ -56,7 +55,7 @@ ROOT_URLCONF = 'library_manager.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,28 +70,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'library_manager.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-
-
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'DJANGO_G',
-        'USER':'djangoadmin',
-        'PASSWORD':'100902',
+        'USER': 'djangoadmin',
+        'PASSWORD': '100902',
         'HOST': 'localhost',
         'PORT': '3306',
-        'OPTIONS' : {
-        'charset':'utf8mb4',
-        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-         }
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -112,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -124,19 +117,26 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
-STATIC_ROOT= str(BASE_DIR / 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / 'core/static']
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = str(BASE_DIR / 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Codificação padrão
+DEFAULT_CHARSET = 'utf-8'
+
+# Configuração do usuário personalizado
+AUTH_USER_MODEL = 'core.Leitor'
+
+# Redirecionamento após login
+LOGIN_REDIRECT_URL = 'perfil'

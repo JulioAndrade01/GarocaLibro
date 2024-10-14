@@ -12,13 +12,19 @@
     <div class="container">
         <h1>Leitor</h1>
         {% bootstrap_messages %}
-        <form method="post" class="form" autocomplete="off" enctype="multipart/form-data">
+        <form method="post">
             {% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
-                <button type="submit" class="btn btn-dark"> Cadastrar </button>
-            {% endbuttons %}
+            {{ form.as_p }}
+            
+            <label for="id_nome">Nome</label>
+            <input id="id_nome" type="text" name="nome" placeholder="Digite o nome">
+        
+            <label for="id_telefone">Telefone</label>
+            <input id="id_telefone" type="text" name="telefone" placeholder="Digite o telefone">
+        
+            <button type="submit">Salvar</button>
         </form>
+        
     </div>
     {% bootstrap_javascript %}
 </body>

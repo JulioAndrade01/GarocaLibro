@@ -5,18 +5,36 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emprestimo</title>
+    <title>Empréstimo</title>
     {% bootstrap_css %}
 </head>
 <body>
     <div class="container">
-        <h1>Emprestimo</h1>
+        <h1>Cadastro de Empréstimo</h1>
         {% bootstrap_messages %}
-        <form method="post" class="form" autocomplete="off" enctype="multipart/form-data">
+
+        <form method="post" class="form" autocomplete="off">
             {% csrf_token %}
-            {% bootstrap_form form %}
+            <!-- Renderiza o formulário com o bootstrap -->
+            <div class="mb-3">
+                <label for="id_leitor">Leitor</label>
+                {{ form.leitor|bootstrap_field }}
+            </div>
+
+            <div class="mb-3">
+                <label for="id_livro">Livro</label>
+                {{ form.livro|bootstrap_field }}
+            </div>
+
+            <div class="mb-3">
+                <label for="id_devolucao">Data de Devolução:</label>
+                <input type="datetime-local" name="devolucao" id="id_devolucao" required>
+
+                {{ form.devolucao|bootstrap_field }} <!-- Certifique-se que o widget correto está no form -->
+            </div>
+
             {% buttons %}
-                <button type="submit" class="btn btn-dark"> Cadastrar </button>
+                <button type="submit" class="btn btn-dark">Cadastrar</button>
             {% endbuttons %}
         </form>
     </div>
