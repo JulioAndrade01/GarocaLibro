@@ -1,5 +1,4 @@
-# core/urls.py
-# core/urls.py
+
 from django.urls import path
 from core.views import (
     IndexView,
@@ -17,7 +16,8 @@ from core.views import (
     login_view,
     perfil_view,
     register,
-    reservas_view,  # Certifique-se de que esta função está definida e não está causando loops
+    agendar_retirada,
+    
 )
 
 urlpatterns = [
@@ -36,5 +36,5 @@ urlpatterns = [
     path('perfil/', perfil_view, name='perfil'),
     path('login/', login_view, name='login'),
     path('register/', register, name='register'),
-    path('reservas/', reservas_view, name='reservas'),  # Verifique se essa linha está correta
+    path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
 ]

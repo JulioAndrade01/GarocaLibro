@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.forms import ValidationError
 from datetime import datetime
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-# Classe base que será herdada
+
+# Classe Base
 class Base(models.Model):
     criado = models.DateTimeField('Data de Criação', auto_now_add=True)
     modificado = models.DateTimeField('Data de Atualização', auto_now=True)
@@ -14,26 +15,49 @@ class Base(models.Model):
         abstract = True
 
 
-# Gerenciador de Leitores
+# Classe LeitorManager (Gerenciador de Leitores)
 class LeitorManager(BaseUserManager):
-    """Gerenciador de Leitores."""
-
     def create_user(self, email, password=None, **extra_fields):
-        """Cria e retorna um leitor com um email e senha."""
         if not email:
             raise ValueError('O email deve ser fornecido')
         email = self.normalize_email(email)
         leitor = self.model(email=email, **extra_fields)
-        leitor.set_password(password)  # Armazena a senha de forma segura
+        leitor.set_password(password)
         leitor.save(using=self._db)
         return leitor
 
     def create_superuser(self, email, password=None, **extra_fields):
-        """Cria e retorna um superusuário com um email e senha."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-
         return self.create_user(email, password, **extra_fields)
+
+
+class Leitor(AbstractBaseUser, PermissionsMixin):
+    nome = models.CharField('Nome', max_length=50)
+    telefone = models.CharField('Telefone', max_length=13)
+    email = models.EmailField('Email', max_length=50, unique=True)
+    endereco = models.CharField('Endereço', max_length=255, blank=True, null=True)
+    foto_perfil = models.ImageField('Foto de Perfil', upload_to='perfil/', blank=True, null=True)
+
+    # Campos de controle de acesso
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    ativo = models.BooleanField(default=True)  # Campo para ativo/inativo
+    criado = models.DateTimeField(auto_now_add=True)  # Data de criação
+    modificado = models.DateTimeField(auto_now=True)  # Data de modificação
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['nome']
+
+    objects = LeitorManager()  # Assegure-se de que você tenha um gerenciador definido
+
+    def has_perm(self, perm, obj=None):
+        """Retorna True se o usuário tiver a permissão especificada."""
+        return self.is_superuser  # Ou implemente sua lógica de permissões
+
+    def has_module_perms(self, app_label):
+        """Retorna True se o usuário tiver permissão para ver o app."""
+        return self.is_superuser  # Ou implemente sua lógica de permissões
 
 
 # Classe Categoria
@@ -69,29 +93,7 @@ class Livro(Base):
         return self.nome
 
 
-# Classe Leitor
-class Leitor(AbstractBaseUser, Base):
-    """Modelo de Leitor."""
-    nome = models.CharField('Nome', max_length=50)
-    telefone = models.CharField('Telefone', max_length=13)
-    email = models.EmailField('Email', max_length=50, unique=True)
-    endereco = models.CharField('Endereço', max_length=255, blank=True, null=True)
-    foto_perfil = models.ImageField('Foto de Perfil', upload_to='perfil/', blank=True, null=True)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nome']  # Campos obrigatórios na criação de usuários
-
-    objects = LeitorManager()
-
-    class Meta:
-        verbose_name = 'Leitor'
-        verbose_name_plural = 'Leitores'
-
-    def __str__(self):
-        return self.nome
-
-
-# Classe Emprestimo
+# Classe Emprestimo (agora após a definição de Leitor e Livro)
 class Emprestimo(Base):
     STATUS_CHOICE = (
         ('in_progress', 'Em andamento'),
@@ -113,3 +115,28 @@ class Emprestimo(Base):
 
     def __str__(self):
         return f'{self.leitor} | {self.livro}'
+
+
+# Classe Agendamento de Retirada
+class Agendamento(Base):
+    STATUS_CHOICE = (
+        ('scheduled', 'Agendado'),
+        ('completed', 'Finalizado')
+    )
+
+    leitor = models.ForeignKey(Leitor, on_delete=models.CASCADE)
+    livro = models.ForeignKey(Livro, on_delete=models.CASCADE)
+    data_retirada = models.DateTimeField('Data de Retirada', help_text="Escolha uma data e hora futuras")
+    status = models.CharField('Status', max_length=20, choices=STATUS_CHOICE, default='scheduled')
+
+    def clean(self):
+        # Verifica se a data de retirada é futura
+        if isinstance(self.data_retirada, datetime) and self.data_retirada <= timezone.now():
+            raise ValidationError('A data de retirada deve ser uma data futura.')
+
+    class Meta:
+        verbose_name = 'Agendamento de Retirada'
+        verbose_name_plural = 'Agendamentos de Retirada'
+
+    def __str__(self):
+        return f'{self.leitor.nome} | {self.livro.nome} | {self.data_retirada}'

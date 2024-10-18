@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Categoria, Leitor, Livro, Emprestimo
+from core.models import Categoria, Leitor, Livro, Emprestimo, Agendamento
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
@@ -9,7 +9,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 class LeitorAdmin(admin.ModelAdmin):
     list_display = ('id', 'nome', 'email', 'telefone', 'criado', 'ativo')
     search_fields = ('nome', 'email')
-    list_filter = ()
+    list_filter = ('ativo',)  
 
 @admin.register(Livro)
 class LivroAdmin(admin.ModelAdmin):
@@ -18,3 +18,9 @@ class LivroAdmin(admin.ModelAdmin):
 @admin.register(Emprestimo)
 class EmprestimoAdmin(admin.ModelAdmin):
     list_display = ('leitor', 'livro', 'devolucao', 'status', 'criado', 'modificado', 'ativo')
+
+@admin.register(Agendamento)
+class AgendamentoAdmin(admin.ModelAdmin):
+    list_display = ('leitor', 'livro', 'data_retirada', 'status')
+    search_fields = ('leitor__nome', 'livro__nome')
+    list_filter = ('status',)

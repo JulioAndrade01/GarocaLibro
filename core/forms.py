@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.hashers import make_password
-from .models import Categoria, Leitor, Livro, Emprestimo
+from .models import Categoria, Leitor, Livro, Emprestimo, Agendamento
 from .admin import LeitorAdmin
 
 
@@ -120,21 +120,14 @@ class LoginForm(forms.Form):
             'placeholder': 'Senha'
         })
     )
+class AgendamentoForm(forms.ModelForm):
+    class Meta:
+        model = Agendamento
+        fields = ['livro', 'data_retirada']
+        widgets = {
+            'livro': forms.Select(attrs={'class': 'form-control'}),
+            'data_retirada': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        password = cleaned_data.get('password')
-
-        if email and password:
-            # Tente autenticar o leitor usando o email
-            try:
-                leitor = Leitor.objects.get(email=email)  # Obtém o leitor baseado no email
-                if leitor.check_password(password):  # Verifica a senha
-                    self.leitor = leitor
-                else:
-                    raise forms.ValidationError("Email ou senha inválidos.")
-            except Leitor.DoesNotExist:
-                raise forms.ValidationError("Email ou senha inválidos.")
-
-        return cleaned_data
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

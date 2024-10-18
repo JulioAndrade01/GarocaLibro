@@ -1,0 +1,52 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Retirada</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <!-- Inclua o CSS do Bootstrap, se necessário -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Agendar Retirada de Livros</h1>
+
+        <!-- Formulário para agendar retirada -->
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <!-- Lista de livros disponíveis -->
+            <div class="form-group">
+                <label for="livros_disponiveis">Livros Disponíveis:</label>
+                <select name="livro" class="form-control" id="livros_disponiveis">
+                    {% for livro in livros_list %}
+                        <option value="{{ livro.id }}">{{ livro.nome }} - Autor: {{ livro.autor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Agendar Retirada</button>
+        </form>
+
+        <!-- Mensagens de erro, se houver -->
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
