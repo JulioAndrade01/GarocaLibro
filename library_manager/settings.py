@@ -2,21 +2,18 @@
 
 from pathlib import Path
 import os
+import dj_database_url  # Para simplificar a conexão com o banco de dados em produção
+from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%tt)f9t-4c-#*eq-&a8==9r)m47sr%nck^4s_o$ngn2^xs#=wh'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Mantenha True para desenvolvimento
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # Adicione outros hosts permitidos aqui, se necessário.
+# Segurança em Produção
+SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())  # Pega do ambiente ou gera uma nova
+DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Use False para produção
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,10 +23,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
+    'whitenoise.runserver_nostatic',  # Para servir arquivos estáticos de forma otimizada
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Configuração de arquivos estáticos para produção
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,7 +42,7 @@ ROOT_URLCONF = 'library_manager.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'core/templates')],  # Adicionando o diretório de templates da aplicação core
+        'DIRS': [os.path.join(BASE_DIR, 'core/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -58,36 +57,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'library_manager.wsgi.application'
 
-# Database
+# Configuração do banco de dados
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'DJANGO_G',
-        'USER': 'djangoadmin',
-        'PASSWORD': '100902',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'mysql://gng7j5d6xu5ivwql:xa0a5n94mqdpy2zt@gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/kzrfbl6fu7qc4uhm'),
+        conn_max_age=600,
+        ssl_require=True  # Usar SSL se necessário
+    )
 }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Internationalization
@@ -98,12 +82,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = str(BASE_DIR / 'staticfiles')  # Pasta onde arquivos estáticos são coletados
 
-# Media files (Uploaded files)
-MEDIA_URL = '/media/'  # URL base para arquivos de mídia
-MEDIA_ROOT = str(BASE_DIR / 'media')  # Diretório onde os arquivos de mídia são armazenados
+# Configuração do WhiteNoise para servir arquivos estáticos em produção
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -115,4 +102,4 @@ DEFAULT_CHARSET = 'utf-8'
 AUTH_USER_MODEL = 'core.Leitor'
 
 # Redirecionamento após login
-LOGIN_REDIRECT_URL = 'perfil'  
+LOGIN_REDIRECT_URL = 'perfil'
