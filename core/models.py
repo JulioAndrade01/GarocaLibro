@@ -4,7 +4,6 @@ from django.forms import ValidationError
 from datetime import datetime
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-
 # Classe Base
 class Base(models.Model):
     criado = models.DateTimeField('Data de Criação', auto_now_add=True)
@@ -13,7 +12,6 @@ class Base(models.Model):
 
     class Meta:
         abstract = True
-
 
 # Classe LeitorManager (Gerenciador de Leitores)
 class LeitorManager(BaseUserManager):
@@ -31,10 +29,9 @@ class LeitorManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-
-class Leitor(AbstractBaseUser, PermissionsMixin):
+class Leitor(Base, AbstractBaseUser, PermissionsMixin):  # Atualização aqui
     nome = models.CharField('Nome', max_length=50)
-    telefone = models.CharField('Telefone', max_length=13)
+    telefone = models.CharField('Telefone', max_length=15)  # Ajuste o tamanho conforme necessário
     email = models.EmailField('Email', max_length=50, unique=True)
     endereco = models.CharField('Endereço', max_length=255, blank=True, null=True)
     foto_perfil = models.ImageField('Foto de Perfil', upload_to='perfil/', blank=True, null=True)
@@ -42,23 +39,17 @@ class Leitor(AbstractBaseUser, PermissionsMixin):
     # Campos de controle de acesso
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    ativo = models.BooleanField(default=True)  # Campo para ativo/inativo
-    criado = models.DateTimeField(auto_now_add=True)  # Data de criação
-    modificado = models.DateTimeField(auto_now=True)  # Data de modificação
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nome']
 
-    objects = LeitorManager()  # Assegure-se de que você tenha um gerenciador definido
+    objects = LeitorManager()
 
     def has_perm(self, perm, obj=None):
-        """Retorna True se o usuário tiver a permissão especificada."""
-        return self.is_superuser  # Ou implemente sua lógica de permissões
+        return self.is_superuser
 
     def has_module_perms(self, app_label):
-        """Retorna True se o usuário tiver permissão para ver o app."""
-        return self.is_superuser  # Ou implemente sua lógica de permissões
-
+        return self.is_superuser
 
 # Classe Categoria
 class Categoria(Base):
@@ -70,7 +61,6 @@ class Categoria(Base):
 
     def __str__(self):
         return self.nome
-
 
 # Classe Livro
 class Livro(Base):
@@ -92,8 +82,7 @@ class Livro(Base):
     def __str__(self):
         return self.nome
 
-
-# Classe Emprestimo (agora após a definição de Leitor e Livro)
+# Classe Emprestimo
 class Emprestimo(Base):
     STATUS_CHOICE = (
         ('in_progress', 'Em andamento'),
@@ -106,7 +95,7 @@ class Emprestimo(Base):
     livro = models.ForeignKey(Livro, on_delete=models.CASCADE)
 
     def clean(self):
-        if isinstance(self.devolucao, datetime) and self.devolucao <= timezone.now():
+        if self.devolucao <= timezone.now():
             raise ValidationError('A data de devolução deve ser uma data futura.')
 
     class Meta:
@@ -115,7 +104,6 @@ class Emprestimo(Base):
 
     def __str__(self):
         return f'{self.leitor} | {self.livro}'
-
 
 # Classe Agendamento de Retirada
 class Agendamento(Base):
@@ -130,8 +118,7 @@ class Agendamento(Base):
     status = models.CharField('Status', max_length=20, choices=STATUS_CHOICE, default='scheduled')
 
     def clean(self):
-        # Verifica se a data de retirada é futura
-        if isinstance(self.data_retirada, datetime) and self.data_retirada <= timezone.now():
+        if self.data_retirada <= timezone.now():
             raise ValidationError('A data de retirada deve ser uma data futura.')
 
     class Meta:

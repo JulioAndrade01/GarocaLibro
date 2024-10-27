@@ -1,15 +1,15 @@
 from django.contrib import admin
-from core.models import Categoria, Leitor, Livro, Emprestimo, Agendamento
+from .models import Categoria, Leitor, Livro, Emprestimo, Agendamento
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nome', 'criado', 'modificado', 'ativo')
 
-@admin.register(Leitor)  # O decorador já faz o registro, sem necessidade de registrar de novo
+@admin.register(Leitor)
 class LeitorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'email', 'telefone', 'criado', 'ativo')
+    list_display = ('id', 'nome', 'email', 'telefone', 'criado', 'modificado', 'ativo')
     search_fields = ('nome', 'email')
-    list_filter = ('ativo',)  
+    list_filter = ('ativo',)
 
 @admin.register(Livro)
 class LivroAdmin(admin.ModelAdmin):
@@ -21,6 +21,6 @@ class EmprestimoAdmin(admin.ModelAdmin):
 
 @admin.register(Agendamento)
 class AgendamentoAdmin(admin.ModelAdmin):
-    list_display = ('leitor', 'livro', 'data_retirada', 'status')
+    list_display = ('leitor', 'livro', 'data_retirada', 'status', 'criado', 'modificado', 'ativo')
     search_fields = ('leitor__nome', 'livro__nome')
     list_filter = ('status',)

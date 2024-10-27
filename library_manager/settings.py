@@ -10,8 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Segurança em Produção
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())  # Pega do ambiente ou gera uma nova
-DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Use False para produção
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+DEBUG = True  # Use False para produção
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -59,12 +59,21 @@ WSGI_APPLICATION = 'library_manager.wsgi.application'
 
 # Configuração do banco de dados
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'mysql://gng7j5d6xu5ivwql:xa0a5n94mqdpy2zt@gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/kzrfbl6fu7qc4uhm'),
-        conn_max_age=600,
-        ssl_require=True  # Usar SSL se necessário
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # Use o MySQL
+        'NAME': 'kzrfbl6fu7qc4uhm',  # Nome do banco de dados
+        'USER': 'gng7j5d6xu5ivwql',  # Usuário do banco de dados
+        'PASSWORD': 'xa0a5n94mqdpy2zt',  # Senha do banco de dados
+        'HOST': 'gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  # Host do banco de dados
+        'PORT': '3306',  # Porta do MySQL
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",  # Mantenha essa linha
+            'charset': 'utf8mb4',  # Define o charset para suportar caracteres especiais
+        },
+        'CONN_MAX_AGE': 600,  # Idade máxima da conexão
+    }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
