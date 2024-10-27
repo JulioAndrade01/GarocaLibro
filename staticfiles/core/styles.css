@@ -44,11 +44,15 @@ h1 {
 .foto-perfil {
     margin-right: 20px;
     border-radius: 50%; /* Imagem de perfil circular */
-    width: 120px; /* Largura da imagem de perfil aumentada */
-    height: 120px; /* Altura da imagem de perfil aumentada */
-    object-fit: cover; /* Corta a imagem para caber no espaço */
-    border: 3px solid #3498db; /* Borda azul mais espessa */
+    width: 150px; /* Tamanho da imagem */
+    height: 150px; /* Tamanho da imagem */
+    object-fit: cover; /* Ajusta a imagem para preencher a moldura */
+    
+    /* Moldura decorativa */
+    border: 5px solid #3498db; /* Cor da borda (moldura) */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Sombra ao redor da moldura */
 }
+
 
 .informacoes p {
     margin: 5px 0;
@@ -57,24 +61,30 @@ h1 {
 }
 
 button, a {
-    background-color: #3498db; /* Cor de fundo do botão */
+    background-color: #3498db; /* Cor azul do botão */
     color: white; /* Cor do texto */
     border: none; /* Remove bordas */
-    padding: 15px 30px; /* Espaçamento interno */
-    margin: 20px auto; /* Centralizado no container */
+    padding: 05px 12px; /* Reduz o tamanho do botão */
+    margin: 10px; /* Ajusta o espaçamento entre os botões */
     font-size: 1.2em; /* Tamanho da fonte */
-    cursor: pointer; /* Muda o cursor para pointer */
+    cursor: pointer; /* Cursor pointer */
     border-radius: 5px; /* Bordas arredondadas */
     transition: background-color 0.3s, transform 0.3s; /* Efeitos de transição */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra do botão */
-    text-decoration: none; /* Remove sublinhado do link */
+    box-shadow: none; /* Remove qualquer sombra */
+    text-decoration: none; /* Remove o sublinhado do link */
     display: inline-block; /* Permite margens e padding */
+    outline: none; /* Remove a borda ao clicar */
+}
+
+button:focus, a:focus {
+    outline: none; /* Remove a borda ao focar no botão */
 }
 
 button:hover, a:hover {
-    background-color: #2980b9; /* Cor de fundo ao passar o mouse */
+    background-color: #2980b9; /* Cor ao passar o mouse */
     transform: translateY(-2px); /* Efeito de elevação */
 }
+
 
 /* Estilo para o formulário de edição */
 form {
