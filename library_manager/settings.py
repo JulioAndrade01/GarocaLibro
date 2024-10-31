@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Segurança em Produção
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())  # Pega do ambiente ou gera uma nova
 DEBUG = True  # Use False para produção
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,garoca1-3d0d78d257fa.herokuapp.com').split(',')
 
 # Application definition
 INSTALLED_APPS = [
