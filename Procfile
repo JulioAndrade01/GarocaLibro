@@ -1,2 +1,2 @@
-web: gunicorn garoca1.wsgi
+ web: gunicorn library.wsgi
 
