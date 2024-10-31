@@ -6,32 +6,31 @@
     <title>Perfil do Leitor</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Perfil do Leitor</h1>
+    <div class="container my-4">
+        <header class="mb-4 text-center">
+            <h1 class="display-4">Perfil do Leitor</h1>
             <nav>
-                <ul>
-                    <li><a href="#perfil">Meu Perfil</a></li>
-                    <li><a href="#editar">Editar Perfil</a></li>
-                    <li><a href="{% url 'agendar_retirada' %}" id="reserva-button">Agendar Retirada de Livros</a></li>
-
-
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item"><a class="nav-link" href="#perfil">Meu Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#editar">Editar Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-success text-white" href="{% url 'agendar_retirada' %}" id="reserva-button">Agendar Retirada de Livros</a></li>
                 </ul>
             </nav>
         </header>
 
         <main>
-            <section id="perfil">
-                <h2>Informações do Perfil</h2>
-                <div class="perfil-info">
-                    <div class="foto-container">
-                        {% if leitor.foto_perfil %}
-                            <img id="foto-perfil" src="{{ leitor.foto_perfil.url }}" alt="Foto de Perfil" class="foto-perfil">
-                        {% else %}
-                            <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="foto-perfil">
-                        {% endif %}
+            <section id="perfil" class="mb-5">
+                <h2 class="h3">Informações do Perfil</h2>
+                <div class="perfil-info d-flex align-items-center">
+                    <div class="foto-container mr-3">
+                        {% if leitor.foto_perfil %} src="{{ leitor.foto_perfil.url }}"
+                            <img id="foto-perfil" src="../../media/perfil/profile_photo.jpg" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
+                        <!-- {% else %} -->
+                            <!-- <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;"> -->
+                        <!-- {% endif %} -->
                     </div>
                     <div class="informacoes">
                         <p><strong>Nome:</strong> <span id="nome-leitor">{{ leitor.nome }}</span></p>
@@ -41,58 +40,35 @@
                 </div>
             </section>
 
-            <section id="editar">
-                <h2>Editar Perfil</h2>
+            <section id="editar" class="mb-5">
+                <h2 class="h3">Editar Perfil</h2>
                 <form id="form-editar" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" required value="{{ leitor.nome }}">
+                        <input type="text" class="form-control" id="nome" name="nome" required placeholder="Nome Completo">
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required value="{{ leitor.email }}">
+                        <input type="email" class="form-control" id="email" name="email" required placeholder="capitu@bentinho.com.br">
                     </div>
                     <div class="form-group">
                         <label for="telefone">Telefone:</label>
-                        <input type="text" id="telefone" name="telefone" required value="{{ leitor.telefone }}">
+                        <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(XX) XXXXX-XXXX" maxlength="14">
                     </div>
-                    <div class="form-group">
-                        <label for="foto">Foto de Perfil:</label>
-                        <input type="file" id="foto" name="foto" accept="image/*">
+                    <div class="form-group mt-5 mb-5">
+                        <label for="foto"><strong>Foto de Perfil:</strong></label>
+                        <input type="file" class="form-control-file" id="foto" name="foto" accept="image/*">
                     </div>
-                    <button type="submit">Salvar Alterações</button>
+                    <button type="submit" class="btn btn-success text-white">Salvar Alterações</button>
                 </form>
             </section>
 
-            <section id="logout">
-                <button id="logout-button">Sair</button>
+            <section id="logout" class="text-center">
+                <button id="logout-button" class="btn btn-danger">Sair</button>
             </section>
         </main>
     </div>
-
-    <script>
-        async function buscarDadosLeitor() {
-            try {
-                const response = await fetch('/api/leitor/');
-                const leitor = await response.json();
-
-                if (leitor) {
-                    document.getElementById("nome-leitor").textContent = leitor.nome;
-                    document.getElementById("email-leitor").textContent = leitor.email;
-                    document.getElementById("telefone-leitor").textContent = leitor.telefone;
-                    document.getElementById("foto-perfil").src = leitor.foto_perfil ? leitor.foto_perfil : '{% static "default-profile.png" %}';
-                }
-            } catch (error) {
-                console.error("Erro ao buscar dados do leitor:", error);
-            }
-        }
-
-        window.onload = buscarDadosLeitor;
-
-        document.getElementById("logout-button").addEventListener("click", function() {
-            window.location.href = "/logout"; 
-        });
-    </script>
 </body>
+
 </html>
