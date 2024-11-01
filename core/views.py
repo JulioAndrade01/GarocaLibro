@@ -124,16 +124,15 @@ def login_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            leitor = authenticate(request, email=email, password=password)
+            leitor = authenticate(request, username=email, password=password)
 
             if leitor is not None:
-                login(request, leitor)  # Logar o leitor
-                return redirect('perfil')  # Redirecionar para o perfil
+                login(request, leitor)
+                return redirect('perfil')
             else:
                 messages.error(request, "Email ou senha inválidos.")
     else:
         form = LoginForm()
-    
     return render(request, 'login.html', {'form': form})
 
 
