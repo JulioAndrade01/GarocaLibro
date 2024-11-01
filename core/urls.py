@@ -34,6 +34,7 @@ urlpatterns = [
     path('emprestimo/add/', EmprestimoCreateView.as_view(), name='emprestimo-create'),
     path('livros/view/', livros_view, name='livros-view'),
     path('perfil/', perfil_view, name='perfil'),
+    path('meu_perfil/', perfil_view, name='meu_perfil'),
     path('login/', login_view, name='login'),
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),

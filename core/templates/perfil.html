@@ -14,7 +14,7 @@
             <h1 class="display-4">Perfil do Leitor</h1>
             <nav>
                 <ul class="nav nav-pills justify-content-center">
-                    <li class="nav-item"><a class="nav-link" href="#perfil">Meu Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#meu_perfil">Meu Perfil</a></li>
                     <li class="nav-item"><a class="nav-link" href="#editar">Editar Perfil</a></li>
                     <li class="nav-item"><a class="nav-link btn btn-success text-white" href="{% url 'agendar_retirada' %}" id="reserva-button">Agendar Retirada de Livros</a></li>
                 </ul>
@@ -28,9 +28,9 @@
                     <div class="foto-container mr-3">
                         {% if leitor.foto_perfil %} src="{{ leitor.foto_perfil.url }}"
                             <img id="foto-perfil" src="../../media/perfil/profile_photo.jpg" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
-                        <!-- {% else %} -->
+                        {% else %}
                             <!-- <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;"> -->
-                        <!-- {% endif %} -->
+                        {% endif %}
                     </div>
                     <div class="informacoes">
                         <p><strong>Nome:</strong> <span id="nome-leitor">{{ leitor.nome }}</span></p>
