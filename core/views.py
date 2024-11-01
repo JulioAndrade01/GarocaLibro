@@ -119,22 +119,16 @@ def register(request):
 
 # Função de login
 def login_view(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            leitor = authenticate(request, username=email, password=password)
-
-            if leitor is not None:
-                login(request, leitor)
-                return redirect('perfil')
-            else:
-                messages.error(request, "Email ou senha inválidos.")
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
-
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('perfil')  # redirecionar para a página inicial ou onde desejar
+        else:
+            messages.error(request, "Credenciais inválidas.")
+    return render(request, 'login.html')
 
 # Função para exibir perfil do usuário logado
 @login_required
