@@ -11,7 +11,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com']
 
-
 # Configuração de aplicações Django
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,26 +56,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'library_manager.wsgi.application'
 
-# Configuração do banco de dados MySQL
+# Configuração do banco de dados MySQL usando JAWSDB_URL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Use o MySQL
-        'NAME': 'kzrfbl6fu7qc4uhm',  # Nome do banco de dados
-        'USER': 'gng7j5d6xu5ivwql',  # Usuário do banco de dados
-        'PASSWORD': 'xa0a5n94mqdpy2zt',  # Senha do banco de dados
-        'HOST': 'gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  # Host do banco de dados
-        'PORT': '3306',  # Porta do MySQL
+        'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",  # Mantenha essa linha
-            'charset': 'utf8mb4',  # Define o charset para suportar caracteres especiais
-        },
-        'CONN_MAX_AGE': 600,  # Idade máxima da conexão
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
+            'charset': 'utf8mb4',
+        }
     }
 }
 
+# Atualiza a configuração do banco de dados a partir da URL JAWSDB
+ja_database_url = os.getenv('JAWSDB_URL')
+if ja_database_url:
+    config = dj_database_url.config(default=ja_database_url)
+    config.pop('sslmode', None)  # Remover sslmode se presente
+    DATABASES['default'].update(config)
 
-# Suporte para DATABASE_URL em caso de fallback (opcional para configurações dinâmicas no Heroku)
-DATABASES['default'].update(dj_database_url.config(conn_max_age=600, ssl_require=True))
+DATABASES['default']['CONN_MAX_AGE'] = 600
 
 # Configuração do Redis como backend de cache
 CACHES = {
@@ -136,4 +134,3 @@ LOGIN_REDIRECT_URL = 'perfil'
 SESSION_COOKIE_SECURE = not DEBUG  # Usar HTTPS em produção
 CSRF_COOKIE_SECURE = not DEBUG  # Usar HTTPS em produção
 SECURE_SSL_REDIRECT = not DEBUG  # Redirecionar HTTP para HTTPS em produção
-
