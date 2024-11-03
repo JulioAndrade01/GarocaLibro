@@ -74,6 +74,7 @@ class LivroModelForm(forms.ModelForm):
                 'placeholder': 'Código do Livro'
             }),
             'nome': forms.TextInput(attrs={
+         
                 'class': 'form-control',
                 'placeholder': 'Nome do Livro'
             }),

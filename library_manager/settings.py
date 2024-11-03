@@ -60,19 +60,20 @@ WSGI_APPLICATION = 'library_manager.wsgi.application'
 # Configuração do banco de dados MySQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',  # Use o MySQL
         'NAME': 'kzrfbl6fu7qc4uhm',  # Nome do banco de dados
         'USER': 'gng7j5d6xu5ivwql',  # Usuário do banco de dados
         'PASSWORD': 'xa0a5n94mqdpy2zt',  # Senha do banco de dados
         'HOST': 'gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  # Host do banco de dados
         'PORT': '3306',  # Porta do MySQL
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
-            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",  # Mantenha essa linha
+            'charset': 'utf8mb4',  # Define o charset para suportar caracteres especiais
         },
         'CONN_MAX_AGE': 600,  # Idade máxima da conexão
     }
 }
+
 
 # Suporte para DATABASE_URL em caso de fallback (opcional para configurações dinâmicas no Heroku)
 DATABASES['default'].update(dj_database_url.config(conn_max_age=600, ssl_require=True))
