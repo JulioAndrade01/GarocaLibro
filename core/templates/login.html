@@ -34,15 +34,8 @@
             <form method="post" action="{% url 'login' %}">
                 {% csrf_token %}
                 
-                <!-- Renderiza os campos do formulário -->
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email</label>
-                    {{ form.email|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.password.id_for_label }}">Senha</label>
-                    {{ form.password|add_class:"form-control" }}
-                </div>
+                <!-- Renderiza os campos do formulário com o template Django -->
+                {{ form.as_p }}
                 
                 <!-- Botão de envio -->
                 <button type="submit" class="btn btn-primary btn-block">Entrar</button>

@@ -119,6 +119,7 @@ class LoginForm(forms.Form):
             'placeholder': 'Senha'
         })
     )
+
 class AgendamentoForm(forms.ModelForm):
     class Meta:
         model = Agendamento
