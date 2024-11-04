@@ -108,8 +108,13 @@ USE_TZ = True
 
 # Configuração de arquivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Definido para produção
+
+# Verifica se o diretório 'static' existe antes de adicionar a STATICFILES_DIRS
+if os.path.exists(os.path.join(BASE_DIR, 'static')):
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+else:
+    STATICFILES_DIRS = []
 
 # Configuração do WhiteNoise para servir arquivos estáticos em produção
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -130,7 +135,12 @@ AUTH_USER_MODEL = 'core.Leitor'
 # Redirecionamento após login
 LOGIN_REDIRECT_URL = 'perfil'
 
-# Segurança dos cookies
-SESSION_COOKIE_SECURE = not DEBUG  # Usar HTTPS em produção
-CSRF_COOKIE_SECURE = not DEBUG  # Usar HTTPS em produção
-SECURE_SSL_REDIRECT = not DEBUG  # Redirecionar HTTP para HTTPS em produção
+# Segurança dos cookies e HTTPS em produção
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+
+# HSTS para reforçar HTTPS
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 ano em produção
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
