@@ -144,3 +144,10 @@ SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 ano em produção
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
+
+# Adicione logging para consultas SQL (opcional)
+import logging
+
+logger = logging.getLogger('django.db.backends')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
