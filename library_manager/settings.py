@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'core',
     'bootstrap5',
     'whitenoise.runserver_nostatic',  # WhiteNoise para arquivos estáticos
+    'storages',  # Adicionado para usar django-storages
 ]
 
 # Configuração do middleware
@@ -113,17 +114,28 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Alternativa para produção usando S3
+if not DEBUG:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_QUERYSTRING_AUTH = False  # Para URLs públicas de mídia no S3
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+
 # Configuração para campo padrão de chaves primárias
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Codificação padrão
 DEFAULT_CHARSET = 'utf-8'
 
-# Usuário customizado
+# Configuração do usuário personalizado
 AUTH_USER_MODEL = 'core.Leitor'
 
-# Redirecionamento após login
-LOGIN_REDIRECT_URL = 'perfil'
+# Configuração de autenticação e redirecionamento
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/core/perfil/'
+LOGOUT_REDIRECT_URL = '/core/login/'
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
