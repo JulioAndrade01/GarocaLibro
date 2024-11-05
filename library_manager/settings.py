@@ -111,7 +111,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Configuração de arquivos de mídia
-MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Alternativa para produção usando S3
@@ -122,6 +121,10 @@ if not DEBUG:
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
     AWS_QUERYSTRING_AUTH = False  # Para URLs públicas de mídia no S3
     AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'  # Definindo AWS_S3_CUSTOM_DOMAIN aqui
+
+# Configuração de arquivos de mídia
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'  # Mover a definição para depois de AWS_S3_CUSTOM_DOMAIN
 
 # Configuração para campo padrão de chaves primárias
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
