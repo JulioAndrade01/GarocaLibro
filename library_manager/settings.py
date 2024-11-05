@@ -22,14 +22,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
-    #'whitenoise.runserver_nostatic',  # WhiteNoise para arquivos estáticos
+    # 'whitenoise.runserver_nostatic',  # WhiteNoise para arquivos estáticos
     'storages',  # Adicionado para usar django-storages
 ]
 
 # Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    #'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,8 +107,7 @@ USE_TZ = True
 # Configuração de arquivos estáticos e WhiteNoise
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Configuração de arquivos de mídia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -119,6 +118,8 @@ if not DEBUG:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY or not AWS_STORAGE_BUCKET_NAME:
+        raise ValueError("AWS credentials and bucket name must be set in environment variables.")
     AWS_QUERYSTRING_AUTH = False  # Para URLs públicas de mídia no S3
     AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'  # Definindo AWS_S3_CUSTOM_DOMAIN aqui
@@ -136,9 +137,9 @@ DEFAULT_CHARSET = 'utf-8'
 AUTH_USER_MODEL = 'core.Leitor'
 
 # Configuração de autenticação e redirecionamento
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/core/perfil/'
-LOGOUT_REDIRECT_URL = '/core/login/'
+LOGIN_URL = '/login/'  # URL para redirecionar quando não autenticado
+LOGIN_REDIRECT_URL = '/perfil/'  # URL para redirecionar após o login
+LOGOUT_REDIRECT_URL = '/login/'  # URL para redirecionar após logout
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG

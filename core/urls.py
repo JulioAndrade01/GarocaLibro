@@ -1,4 +1,3 @@
-
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -20,7 +19,6 @@ from core.views import (
     perfil_view,
     register,
     agendar_retirada,
-    
 )
 
 urlpatterns = [
@@ -42,5 +40,6 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
