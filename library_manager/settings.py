@@ -22,14 +22,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
-    # 'whitenoise.runserver_nostatic',  # WhiteNoise para arquivos estáticos
-    'storages',  # Adicionado para usar django-storages
+    'storages',  # django-storages para integração com AWS S3
 ]
 
 # Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -104,28 +103,25 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Configuração de arquivos estáticos e WhiteNoise
+# Configuração de arquivos estáticos (WhiteNoise)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Configuração de arquivos de mídia
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Configuração de arquivos de mídia (AWS S3 para produção)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Diretório local para DEBUG=True
+MEDIA_URL = '/media/'
 
-# Alternativa para produção usando S3
 if not DEBUG:
+    # Configuração para Amazon S3
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY or not AWS_STORAGE_BUCKET_NAME:
-        raise ValueError("AWS credentials and bucket name must be set in environment variables.")
     AWS_QUERYSTRING_AUTH = False  # Para URLs públicas de mídia no S3
     AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'  # Definindo AWS_S3_CUSTOM_DOMAIN aqui
-
-# Configuração de arquivos de mídia
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'  # Mover a definição para depois de AWS_S3_CUSTOM_DOMAIN
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 # Configuração para campo padrão de chaves primárias
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
