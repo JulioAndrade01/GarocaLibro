@@ -149,3 +149,8 @@ SECURE_HSTS_PRELOAD = not DEBUG
 logger = logging.getLogger('django.db.backends')
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
+
+# Adicionando um logger específico para S3
+s3_logger = logging.getLogger('storages.backends.s3boto3')
+s3_logger.setLevel(logging.DEBUG)
+s3_logger.addHandler(logging.StreamHandler())
