@@ -1,4 +1,4 @@
-asgiref==3.8.1
+ysasgiref==3.8.1
 async-timeout==5.0.0
 beautifulsoup4==4.11.1
 boto3==1.35.54
@@ -25,4 +25,4 @@ static3==0.7.0
 typing_extensions==4.12.2
 tzdata==2024.1
 urllib3==1.26.20
-whitenoise==6.7.0
+

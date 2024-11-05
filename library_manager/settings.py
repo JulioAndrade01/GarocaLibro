@@ -22,14 +22,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
-    'whitenoise.runserver_nostatic',  # WhiteNoise para arquivos estáticos
+    #'whitenoise.runserver_nostatic',  # WhiteNoise para arquivos estáticos
     'storages',  # Adicionado para usar django-storages
 ]
 
 # Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
+    #'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,8 +107,8 @@ USE_TZ = True
 # Configuração de arquivos estáticos e WhiteNoise
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Configuração de arquivos de mídia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
