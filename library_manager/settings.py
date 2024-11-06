@@ -73,7 +73,6 @@ DATABASES = {
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
     config = dj_database_url.config(default=ja_database_url)
-    config.pop('sslmode', None)  # Remove o sslmode se estiver presente
     DATABASES['default'].update(config)
 
 DATABASES['default']['CONN_MAX_AGE'] = 600  # Conexões persistentes para melhor desempenho
@@ -136,6 +135,11 @@ AUTH_USER_MODEL = 'core.Leitor'
 LOGIN_URL = '/login/'  # URL para redirecionar quando não autenticado
 LOGIN_REDIRECT_URL = '/perfil/'  # URL para redirecionar após o login
 LOGOUT_REDIRECT_URL = '/login/'  # URL para redirecionar após logout
+
+# Backends de autenticação
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
