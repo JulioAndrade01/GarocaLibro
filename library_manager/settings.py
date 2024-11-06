@@ -10,8 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Segurança em Produção
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())  # Pega do ambiente ou gera uma nova
-DEBUG = True  # Use False para produção
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Define False em produção, com variável de ambiente
+
+# Definir ALLOWED_HOSTS conforme necessário para produção
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,garoca1-3d0d78d257fa.herokuapp.com').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -57,23 +59,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'library_manager.wsgi.application'
 
-# Configuração do banco de dados
+# Configuração do banco de dados MySQL para produção
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Use o MySQL
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'kzrfbl6fu7qc4uhm',  # Nome do banco de dados
         'USER': 'gng7j5d6xu5ivwql',  # Usuário do banco de dados
         'PASSWORD': 'xa0a5n94mqdpy2zt',  # Senha do banco de dados
         'HOST': 'gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',  # Host do banco de dados
         'PORT': '3306',  # Porta do MySQL
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",  # Mantenha essa linha
-            'charset': 'utf8mb4',  # Define o charset para suportar caracteres especiais
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
+            'charset': 'utf8mb4',
         },
         'CONN_MAX_AGE': 600,  # Idade máxima da conexão
     }
 }
 
+# Adicionar suporte para DATABASE_URL em caso de fallback (opcional para configurações dinâmicas no Heroku)
+DATABASES['default'].update(dj_database_url.config(conn_max_age=600, ssl_require=True))
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -112,3 +116,21 @@ AUTH_USER_MODEL = 'core.Leitor'
 
 # Redirecionamento após login
 LOGIN_REDIRECT_URL = 'perfil'
+
+# Configuração do Redis para sessões e cache (recomendado para produção no Heroku)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL'),  # Defina REDIS_URL no ambiente do Heroku
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+# Segurança dos cookies
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True  # Redireciona HTTP para HTTPS em produção

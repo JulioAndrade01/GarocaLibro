@@ -1,2 +1,1 @@
-web: gunicorn garoca1.wsgi
-
+web: gunicorn library_manager.wsgi
