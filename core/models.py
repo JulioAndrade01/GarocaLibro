@@ -18,7 +18,7 @@ class LeitorManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('O email deve ser fornecido')
-        email = self.normalize_email(email)
+        email = self.model.normalize_email(email)  # O normalize_email já é feito aqui
         leitor = self.model(email=email, **extra_fields)
         leitor.set_password(password)
         leitor.save(using=self._db)
@@ -34,6 +34,7 @@ class LeitorManager(BaseUserManager):
             raise ValueError('Superuser precisa ter is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
+
 
 class Leitor(Base, AbstractBaseUser, PermissionsMixin):
     nome = models.CharField('Nome', max_length=50)

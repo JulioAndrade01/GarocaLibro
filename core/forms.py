@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from .models import Categoria, Leitor, Livro, Emprestimo, Agendamento
 
@@ -108,12 +108,15 @@ class EmprestimoModelForm(forms.ModelForm):
         }
 
 class LoginForm(forms.Form):
-    """Formulário de login usando e-mail e senha."""
+    """Formulário de Login com validação de e-mail e senha."""
+    
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Email'
-        })
+            'placeholder': 'Email',
+            'autofocus': 'autofocus'  # Campo de email começa com foco
+        }),
+        error_messages={'invalid': 'Por favor, insira um email válido.'}  # Mensagem de erro personalizada
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
