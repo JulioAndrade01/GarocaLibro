@@ -12,6 +12,8 @@ from django.utils.timezone import make_aware
 from datetime import datetime, date
 from django.http import JsonResponse
 
+# Configura o logger
+logger = logging.getLogger(__name__)
 
 # Páginas principais
 class IndexView(TemplateView):
@@ -46,7 +48,7 @@ class LeitorDeleteView(DeleteView):
 # Visualizações relacionadas ao Livro
 class LivroListView(TemplateView):
     template_name = 'livro-list.html'
-    context_object_name = 'livros'  
+    context_object_name = 'livros'
 
 
 class LivroCreateView(CreateView):
@@ -89,16 +91,15 @@ class EmprestimoCreateView(CreateView):
 
 # Visualização de reservas
 @login_required
-def ReservasView(request):
-    # Filtrar os empréstimos (reservas) do leitor atual
+def reservas_view(request):
     reservas = Emprestimo.objects.filter(leitor=request.user.leitor)
     return render(request, 'reservas.html', {'reservas': reservas})
 
 
 # Listagem de livros
 def livros_view(request):
-    livros = Livro.objects.all()  # Obtendo todos os livros do banco de dados
-    return render(request, 'livros.html', {'livros': livros})  # Certifique-se de ter um template chamado 'livros.html'
+    livros = Livro.objects.all()
+    return render(request, 'livros.html', {'livros': livros})
 
 
 # Função de registro
@@ -107,11 +108,11 @@ def register(request):
         form = LeitorModelForm(request.POST)
         if form.is_valid():
             leitor = form.save(commit=False)
-            leitor.telefone = 'Desconhecido'  # Defina um telefone padrão, se necessário
-            leitor.set_password(form.cleaned_data['password'])  # Salve a senha de forma segura
+            leitor.telefone = 'Desconhecido'
+            leitor.set_password(form.cleaned_data['password'])
             leitor.save()
-            login(request, leitor)  # Logar o usuário após o registro
-            return redirect('home')  # Redirecionar após o registro bem-sucedido
+            login(request, leitor)
+            return redirect('home')
     else:
         form = LeitorModelForm()
     return render(request, 'register.html', {'form': form})
@@ -119,7 +120,7 @@ def register(request):
 
 # Função de login
 def login_view(request):
-    form = LoginForm(request.POST or None)  # Inicializa o formulário
+    form = LoginForm(request.POST or None)
     if request.method == "POST":
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -127,10 +128,11 @@ def login_view(request):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('perfil')  # redirecionar para a página inicial ou onde desejar
+                return redirect('perfil')
             else:
                 messages.error(request, "Credenciais inválidas.")
     return render(request, 'login.html', {'form': form})
+
 
 # Função para exibir perfil do usuário logado
 @login_required
@@ -139,7 +141,7 @@ def perfil_view(request):
         leitor = get_object_or_404(Leitor, email=request.user.email)
         return render(request, 'perfil.html', {'leitor': leitor})
     except Exception as e:
-        logging.error(f"Erro ao carregar o perfil: {str(e)}")
+        logger.error(f"Erro ao carregar o perfil: {str(e)}")
         return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
 
 
@@ -171,41 +173,33 @@ def api_leitor(request):
         }
         return JsonResponse(dados_leitor)
     except Exception as e:
-        logging.error(f"Erro ao retornar dados do leitor: {str(e)}")
+        logger.error(f"Erro ao retornar dados do leitor: {str(e)}")
         return JsonResponse({'error': 'Erro ao recuperar dados.'}, status=500)
 
 
-# -----------------------------------------------
 # Função para agendar retirada de livros
-# -----------------------------------------------
-
 @login_required
 def agendar_retirada(request):
-    # Filtrar apenas os livros disponíveis (status=True)
     livros_list = Livro.objects.filter(status=True)
     
     if request.method == 'POST':
         form = AgendamentoForm(request.POST)
         if form.is_valid():
-            # Verificar se o livro selecionado ainda está disponível
             livro_selecionado = form.cleaned_data['livro']
             if livro_selecionado.status:
-                # Criar o agendamento e associá-lo ao usuário logado
                 agendamento = form.save(commit=False)
-                agendamento.leitor = request.user  # Associando ao usuário logado (Leitor)
+                agendamento.leitor = request.user
                 agendamento.save()
 
-                # Marcar o livro como indisponível
                 livro_selecionado.status = False
                 livro_selecionado.save()
-                return redirect('perfil')  # Redirecionar após o agendamento bem-sucedido
+                return redirect('perfil')
             else:
                 form.add_error('livro', 'Este livro já foi reservado.')
     else:
         form = AgendamentoForm()
 
     return render(request, 'agendar_retirada.html', {'form': form, 'livros_list': livros_list})
-
 
 
 # Função de sucesso ao agendar retirada

@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com']
+ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost']
 
 # Configuração dos apps do Django
 INSTALLED_APPS = [
@@ -73,6 +73,7 @@ DATABASES = {
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
     config = dj_database_url.config(default=ja_database_url)
+    config.pop('sslmode', None)  # Corrige erro SSL se presente
     DATABASES['default'].update(config)
 
 DATABASES['default']['CONN_MAX_AGE'] = 600  # Conexões persistentes para melhor desempenho
@@ -136,11 +137,6 @@ LOGIN_URL = '/login/'  # URL para redirecionar quando não autenticado
 LOGIN_REDIRECT_URL = '/perfil/'  # URL para redirecionar após o login
 LOGOUT_REDIRECT_URL = '/login/'  # URL para redirecionar após logout
 
-# Backends de autenticação
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
@@ -149,12 +145,30 @@ SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 
-# Adicione logging para consultas SQL (opcional)
-logger = logging.getLogger('django.db.backends')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
-
-# Adicionando um logger específico para S3
-s3_logger = logging.getLogger('storages.backends.s3boto3')
-s3_logger.setLevel(logging.DEBUG)
-s3_logger.addHandler(logging.StreamHandler())
+# Logging Configurations
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG'
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG' if DEBUG else 'ERROR',
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'ERROR',
+            'propagate': False,
+        },
+        'storages.backends.s3boto3': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'ERROR',
+            'propagate': False,
+        },
+    }
+}
