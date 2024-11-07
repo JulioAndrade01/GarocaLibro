@@ -27,9 +27,15 @@ class LeitorManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser precisa ter is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser precisa ter is_superuser=True.')
+
         return self.create_user(email, password, **extra_fields)
 
-class Leitor(Base, AbstractBaseUser, PermissionsMixin):  # Atualização aqui
+class Leitor(Base, AbstractBaseUser, PermissionsMixin):
     nome = models.CharField('Nome', max_length=50)
     telefone = models.CharField('Telefone', max_length=15)  # Ajuste o tamanho conforme necessário
     email = models.EmailField('Email', max_length=50, unique=True)
@@ -98,6 +104,10 @@ class Emprestimo(Base):
         if self.devolucao <= timezone.now():
             raise ValidationError('A data de devolução deve ser uma data futura.')
 
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Garante que a validação seja aplicada ao salvar
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Empréstimo'
         verbose_name_plural = 'Empréstimos'
@@ -120,6 +130,10 @@ class Agendamento(Base):
     def clean(self):
         if self.data_retirada <= timezone.now():
             raise ValidationError('A data de retirada deve ser uma data futura.')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Garante que a validação seja aplicada ao salvar
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Agendamento de Retirada'
