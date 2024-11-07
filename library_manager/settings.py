@@ -10,7 +10,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost']
+
+# Configuração de ALLOWED_HOSTS, preferencialmente via variável de ambiente
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 
 # Configuração dos apps do Django
 INSTALLED_APPS = [
@@ -59,7 +61,7 @@ TEMPLATES = [
     },
 ]
 
-# Configuração do banco de dados com JAWSDB
+# Configuração do banco de dados com JAWSDB_URL (mantendo o dj_database_url)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -79,7 +81,7 @@ if ja_database_url:
 
 DATABASES['default']['CONN_MAX_AGE'] = 600  # Conexões persistentes para melhor desempenho
 
-# Configuração de cache em memória (substitui Redis)
+# Configuração de cache (em memória para desenvolvimento)
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
