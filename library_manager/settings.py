@@ -23,18 +23,19 @@ INSTALLED_APPS = [
     'core',
     'bootstrap5',
     'storages',  # django-storages para integração com AWS S3
+    'csp',  # Adicionado para Content Security Policy
 ]
 
 # Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
+    'csp.middleware.CSPMiddleware',  # Adicionado para Content Security Policy
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # Configuração de URLs e WSGI
@@ -144,6 +145,15 @@ SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
+
+# Cabeçalhos de segurança
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_CONTENT_TYPE_OPTIONS = 'nosniff'
+
+# Configuração para Content-Security-Policy (CSP)
+CSP_DEFAULT_SRC = ("'self'",)  # Permite carregar recursos apenas da mesma origem
+CSP_FRAME_ANCESTORS = ("'self'",)  # Restringe o carregamento do site dentro de iframes da mesma origem
 
 # Logging Configurations
 LOGGING = {
