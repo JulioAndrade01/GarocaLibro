@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Configuração de ALLOWED_HOSTS, preferencialmente via variável de ambiente
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Configuração dos apps do Django
 INSTALLED_APPS = [
