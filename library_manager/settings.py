@@ -62,6 +62,7 @@ TEMPLATES = [
 ]
 
 # Configuração do banco de dados com JAWSDB_URL (mantendo o dj_database_url)
+# Configuração do banco de dados
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -72,14 +73,29 @@ DATABASES = {
     }
 }
 
-# Atualizar configurações do banco de dados com JAWSDB_URL
+# Se a variável de ambiente JAWSDB_URL estiver configurada (Heroku), use-a
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
     config = dj_database_url.config(default=ja_database_url)
-    config.pop('sslmode', None)  # Corrige erro SSL se presente
     DATABASES['default'].update(config)
+else:
+    # Banco de dados local
+    if DEBUG:
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'DJANGO_G',
+            'USER': 'djangoadmin',  # Ou outro usuário local
+            'PASSWORD': '100902',  # Senha para o banco local
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+            }
+        }
 
 DATABASES['default']['CONN_MAX_AGE'] = 600  # Conexões persistentes para melhor desempenho
+
 
 # Configuração de cache (em memória para desenvolvimento)
 CACHES = {
