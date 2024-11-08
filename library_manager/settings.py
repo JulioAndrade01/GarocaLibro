@@ -2,15 +2,13 @@ from pathlib import Path
 import os
 import dj_database_url
 from django.core.management.utils import get_random_secret_key
-import logging
 
 # Diretório base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
-#DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # ALLOWED_HOSTS com os valores para ambiente local e Heroku
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
@@ -34,6 +32,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
     'csp.middleware.CSPMiddleware',  # Adicionado para Content Security Policy
+    'django.middleware.http.ConditionalGetMiddleware',  # Middleware condicional para cache
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -169,6 +168,18 @@ X_CONTENT_TYPE_OPTIONS = 'nosniff'
 # Configuração para Content-Security-Policy (CSP)
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_FRAME_ANCESTORS = ("'self'",)
+
+# Middleware para adicionar cabeçalho Cache-Control
+from django.utils.cache import patch_cache_control
+from django.utils.deprecation import MiddlewareMixin
+
+class CacheControlMiddleware(MiddlewareMixin):
+    def process_response(self, request, response):
+        patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+        return response
+
+# Adicione CacheControlMiddleware ao final da lista de middlewares
+MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
 
 # Logging Configurations
 LOGGING = {
