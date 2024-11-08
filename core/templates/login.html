@@ -33,12 +33,18 @@
         <div class="login-container">
             <h2 class="text-center mb-4">Login</h2>
 
-            <!-- Apenas um formulário, sem duplicidade -->
+            <!-- Formulário de login -->
             <form method="post">
                 {% csrf_token %} <!-- Token CSRF obrigatório para POST seguro -->
 
-                <!-- Renderiza o formulário com campos do Django -->
+                <!-- Renderiza o formulário com os campos do Django -->
                 {{ form.as_p }} 
+
+                <!-- Checkbox para "Continuar logado" -->
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                    <label class="form-check-label" for="remember_me">Continuar logado</label>
+                </div>
 
                 <!-- Botão de envio -->
                 <button type="submit" class="btn btn-primary btn-block">Entrar</button>
