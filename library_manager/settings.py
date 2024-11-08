@@ -120,8 +120,15 @@ USE_TZ = True
 
 # Configuração de arquivos estáticos
 STATIC_URL = '/static/'
+
+# Diretório para os arquivos estáticos gerados
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Configuração do Whitenoise para arquivos estáticos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Adicionando cabeçalhos de cache
+WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
 
 # Configuração de arquivos de mídia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -154,12 +161,12 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = not DEBUG
-SECURE_SSL_REDIRECT = not DEBUG
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_SSL_REDIRECT = not DEBUG  # Redireciona HTTP para HTTPS
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 ano de segurança
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
+
 
 # Cabeçalhos de segurança
 SECURE_BROWSER_XSS_FILTER = True
@@ -177,7 +184,13 @@ class CacheControlMiddleware(MiddlewareMixin):
         else:
             # Para outras páginas, permite cache
             patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
+
+        # Cabeçalhos para arquivos estáticos
+        if request.path.startswith('/static/'):
+            patch_cache_control(response, public=True, max_age=WHITENOISE_MAX_AGE, immutable=True)
+
         return response
+
 
 # Adiciona ao final da lista de middlewares
 MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
