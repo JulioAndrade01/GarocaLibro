@@ -11,8 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-# Configuração de ALLOWED_HOSTS, preferencialmente via variável de ambiente
-ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS com os valores para ambiente local e Heroku
+ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost']
 
 # Configuração dos apps do Django
 INSTALLED_APPS = [
@@ -61,7 +61,6 @@ TEMPLATES = [
     },
 ]
 
-# Configuração do banco de dados com JAWSDB_URL (mantendo o dj_database_url)
 # Configuração do banco de dados
 DATABASES = {
     'default': {
@@ -73,7 +72,7 @@ DATABASES = {
     }
 }
 
-# Se a variável de ambiente JAWSDB_URL estiver configurada (Heroku), use-a
+# Configuração do banco de dados no Heroku usando JAWSDB_URL
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
     config = dj_database_url.config(default=ja_database_url)
@@ -81,23 +80,25 @@ if ja_database_url:
 else:
     # Banco de dados local
     if DEBUG:
-        DATABASES['default'] = {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'DJANGO_G',
-            'USER': 'djangoadmin',  # Ou outro usuário local
-            'PASSWORD': '100902',  # Senha para o banco local
-            'HOST': 'localhost',
-            'PORT': '3306',
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-            }
+       DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'DJANGO_G',
+        'USER': 'djangoadmin',  # ou o usuário correto
+        'PASSWORD': '100902',  # a senha correta do banco de dados
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
+    }
+}
 
-DATABASES['default']['CONN_MAX_AGE'] = 600  # Conexões persistentes para melhor desempenho
 
+DATABASES['default']['CONN_MAX_AGE'] = 600
 
-# Configuração de cache (em memória para desenvolvimento)
+# Configuração de cache usando apenas LocMemCache
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -105,7 +106,7 @@ CACHES = {
     }
 }
 
-# Configuração de sessão para usar banco de dados (ao invés de Redis)
+# Configuração de sessão
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Validação de senha
@@ -122,13 +123,13 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Configuração de arquivos estáticos (WhiteNoise)
+# Configuração de arquivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Configuração de arquivos de mídia (AWS S3 para produção)
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Diretório local para DEBUG=True
+# Configuração de arquivos de mídia
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 if not DEBUG:
@@ -137,7 +138,7 @@ if not DEBUG:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_QUERYSTRING_AUTH = False  # Para URLs públicas de mídia no S3
+    AWS_QUERYSTRING_AUTH = False
     AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
@@ -152,9 +153,9 @@ DEFAULT_CHARSET = 'utf-8'
 AUTH_USER_MODEL = 'core.Leitor'
 
 # Configuração de autenticação e redirecionamento
-LOGIN_URL = '/login/'  # URL para redirecionar quando não autenticado
-LOGIN_REDIRECT_URL = '/perfil/'  # URL para redirecionar após o login
-LOGOUT_REDIRECT_URL = '/login/'  # URL para redirecionar após logout
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/perfil/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
@@ -170,8 +171,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_CONTENT_TYPE_OPTIONS = 'nosniff'
 
 # Configuração para Content-Security-Policy (CSP)
-CSP_DEFAULT_SRC = ("'self'",)  # Permite carregar recursos apenas da mesma origem
-CSP_FRAME_ANCESTORS = ("'self'",)  # Restringe o carregamento do site dentro de iframes da mesma origem
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_FRAME_ANCESTORS = ("'self'",)
 
 # Logging Configurations
 LOGGING = {
