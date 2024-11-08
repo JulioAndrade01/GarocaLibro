@@ -26,19 +26,11 @@
                 <h2 class="h3">Informações do Perfil</h2>
                 <div class="perfil-info d-flex align-items-center">
                     <div class="foto-container mr-3">
-<<<<<<< HEAD
-                        {% if leitor.foto_perfil %}
-                            <img id="foto-perfil" src="{{ leitor.foto_perfil.url }}" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
-                        {% else %}
-                            <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;">
-                        {% endif %}
-=======
                         {% if leitor.foto_perfil %} src="{{ leitor.foto_perfil.url }}"
                             <img id="foto-perfil" src="../../media/perfil/profile_photo.jpg" alt="Foto de Perfil" class="rounded-circle" style="width: 150px; height: 150px;">
                         <!-- {% else %} -->
                             <!-- <img id="foto-perfil" src="{% static 'default-profile.png' %}" alt="Foto de Perfil Padrão" class="rounded-circle" style="width: 150px; height: 150px;"> -->
                         <!-- {% endif %} -->
->>>>>>> 13f2ea47 (arrumei tres telas login perfil register)
                     </div>
                     <div class="informacoes">
                         <p><strong>Nome:</strong> <span id="nome-leitor">{{ leitor.nome }}</span></p>
@@ -54,19 +46,6 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="nome">Nome:</label>
-<<<<<<< HEAD
-                        <input type="text" class="form-control" id="nome" name="nome" required placeholder="Nome Completo" value="{{ leitor.nome }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" name="email" required placeholder="capitu@bentinho.com.br" value="{{ leitor.email }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="telefone">Telefone:</label>
-                        <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(XX) XXXXX-XXXX" maxlength="14" value="{{ leitor.telefone }}">
-                    </div>
-                    <div class="form-group mt-4 mb-5">
-=======
                         <input type="text" class="form-control" id="nome" name="nome" required placeholder="Nome Completo">
                     </div>
                     <div class="form-group">
@@ -78,7 +57,6 @@
                         <input type="text" class="form-control" id="telefone" name="telefone" required placeholder="(XX) XXXXX-XXXX" maxlength="14">
                     </div>
                     <div class="form-group mt-5 mb-5">
->>>>>>> 13f2ea47 (arrumei tres telas login perfil register)
                         <label for="foto"><strong>Foto de Perfil:</strong></label>
                         <input type="file" class="form-control-file" id="foto" name="foto" accept="image/*">
                     </div>
@@ -86,13 +64,8 @@
                 </form>
             </section>
 
-<<<<<<< HEAD
-            <section id="logout" class="text-center mt-5">
-                <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
-=======
             <section id="logout" class="text-center">
                 <button id="logout-button" class="btn btn-danger">Sair</button>
->>>>>>> 13f2ea47 (arrumei tres telas login perfil register)
             </section>
         </main>
     </div>
