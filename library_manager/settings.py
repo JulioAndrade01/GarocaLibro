@@ -21,7 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'bootstrap5',
-    'storages',
+    'storages',  # Adicionando o django-storages para integração com o S3
 ]
 
 # Configuração do middleware
@@ -116,24 +116,24 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
 
-# Configuração de arquivos de mídia
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Configuração de arquivos de mídia (S3)
+MEDIA_URL = 'https://{AWS_S3_CUSTOM_DOMAIN}/media/'  # Usando o domínio customizado S3
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Isso será ignorado em produção se S3 estiver ativo
 
-# Se não estiver em modo DEBUG, use o S3 para armazenar os arquivos de mídia
 if not DEBUG:
+    # Configuração para armazenar no S3
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_QUERYSTRING_AUTH = False
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')  # Configuração da região do bucket
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+    AWS_QUERYSTRING_AUTH = False  # Evita URL temporárias para os arquivos
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_CHARSET = 'utf-8'
 
+# Configuração de usuários e autenticação
 AUTH_USER_MODEL = 'core.Leitor'
 
 LOGIN_URL = '/login/'
