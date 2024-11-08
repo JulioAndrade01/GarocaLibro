@@ -1,1 +1,1 @@
-web: gunicorn library_manager.wsgi --timeout 60
+web: gunicorn library_manager.wsgi --timeout 30
