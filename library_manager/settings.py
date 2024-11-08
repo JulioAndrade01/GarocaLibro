@@ -8,8 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
-#DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # ALLOWED_HOSTS com os valores para ambiente local e Heroku
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
@@ -155,6 +154,7 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
@@ -164,19 +164,20 @@ SECURE_HSTS_PRELOAD = not DEBUG
 # Cabeçalhos de segurança
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_CONTENT_TYPE_OPTIONS = 'nosniff'
 
 # Configuração para Content-Security-Policy (CSP)
 CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com', 'https://code.jquery.com')
+CSP_STYLE_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com')
 CSP_FRAME_ANCESTORS = ("'self'",)
 
-# Middleware para adicionar cabeçalho Cache-Control
+# Middleware para adicionar cabeçalho Cache-Control simplificado
 from django.utils.cache import patch_cache_control
 from django.utils.deprecation import MiddlewareMixin
 
 class CacheControlMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+        patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
         return response
 
 # Adicione CacheControlMiddleware ao final da lista de middlewares
