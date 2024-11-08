@@ -9,13 +9,13 @@
     <!-- Link para o CSS do Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Link para CSS personalizado, se houver, com uso de template tag estática do Django -->
+    <!-- Link para CSS personalizado com a tag estática do Django -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     
     <style>
         body {
-            /* Usa a tag {% static %} para carregar a imagem de fundo de forma compatível com o Django */
-            background-image: url("{% static 'media/cp.jpg' %}"); 
+            /* Carrega a imagem de fundo de forma compatível com o Django */
+            background-image: url("{% static 'images/cp.jpg' %}"); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -84,7 +84,7 @@
 
             <!-- Link para página de registro -->
             <p class="mt-3 text-center">
-                Não tem uma conta? <a href="{% url 'register' %}">Registre-se aqui</a>
+                Não tem uma conta? <a href="{% url 'register' %}">Cadastre-se aqui</a>
             </p>
         </div>
     </div>
