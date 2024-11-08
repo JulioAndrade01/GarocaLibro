@@ -11,12 +11,12 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-pzjw8f+ua7Kw1TIq0v8FqC5e4pUm8VfYYc9v+hJ3DHTK5tO1R6xyL1HnJWeScX2V" crossorigin="anonymous">
     
     <!-- Link para CSS personalizado com a tag estática do Django -->
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}">  <!-- Ajuste o caminho se necessário -->
     
     <style>
         body {
             /* Carrega a imagem de fundo de forma compatível com o Django */
-            background-image: url("{% static 'images/cp.jpg' %}"); 
+            background-image: url("{% static 'core/images/cp.jpg' %}");  <!-- Ajuste o caminho da imagem -->
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
