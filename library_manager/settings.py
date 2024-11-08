@@ -8,8 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-
+#DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG=True
 # ALLOWED_HOSTS com os valores para ambiente local e Heroku
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
 
