@@ -121,6 +121,7 @@ def register(request):
 # Função de login
 def login_view(request):
     form = LoginForm(request.POST or None)
+    
     if request.method == "POST":
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -131,7 +132,13 @@ def login_view(request):
                 return redirect('perfil')
             else:
                 messages.error(request, "Credenciais inválidas.")
-    return render(request, 'login.html', {'form': form})
+                
+    response = render(request, 'login.html', {'form': form})
+    
+    # Desabilita cache para a página de login
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
+    
+    return response
 
 
 # Função para exibir perfil do usuário logado
