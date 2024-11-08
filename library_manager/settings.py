@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # ALLOWED_HOSTS com os valores para ambiente local e Heroku
-ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Configuração dos apps do Django
 INSTALLED_APPS = [
@@ -75,26 +75,21 @@ DATABASES = {
 # Configuração do banco de dados no Heroku usando JAWSDB_URL
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
-    config = dj_database_url.config(default=ja_database_url)
-    DATABASES['default'].update(config)
+    DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
 else:
     # Banco de dados local
     if DEBUG:
-       DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'DJANGO_G',
-        'USER': 'djangoadmin',  # ou o usuário correto
-        'PASSWORD': '100902',  # a senha correta do banco de dados
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
-    }
-}
-
+        DATABASES['default'].update({
+            'NAME': 'DJANGO_G',
+            'USER': 'djangoadmin',  # ou o usuário correto
+            'PASSWORD': '100902',  # a senha correta do banco de dados
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+            }
+        })
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
