@@ -119,6 +119,8 @@ def register(request):
 
 
 # Função de login
+from django.http import HttpResponse
+
 def login_view(request):
     form = LoginForm(request.POST or None)
     
@@ -135,10 +137,12 @@ def login_view(request):
                 
     response = render(request, 'login.html', {'form': form})
     
-    # Desabilita cache para a página de login
+    # Desabilitar cache para a página de login
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
     
+    # Forçar o cabeçalho Cache-Control em outras páginas se necessário
     return response
+
 
 
 # Função para exibir perfil do usuário logado
