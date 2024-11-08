@@ -106,15 +106,21 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
+# Configuração de arquivos estáticos
 STATIC_URL = '/static/'
+
+# Diretório onde os arquivos estáticos serão armazenados após o comando `collectstatic`
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Usando o WhiteNoise para servir arquivos estáticos em produção
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Configuração de arquivos de mídia
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Se não estiver em modo DEBUG, use o S3 para armazenar os arquivos de mídia
 if not DEBUG:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -134,6 +140,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil/'
 LOGOUT_REDIRECT_URL = '/login/'
 
+# Configuração de cookies para segurança em produção
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
@@ -164,6 +171,7 @@ class CacheControlMiddleware(MiddlewareMixin):
 
 MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
 
+# Configuração de logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
