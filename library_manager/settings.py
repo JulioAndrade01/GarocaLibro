@@ -124,6 +124,7 @@ STATIC_URL = '/static/'
 # Diretório para os arquivos estáticos gerados
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+
 # Configuração do Whitenoise para arquivos estáticos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
