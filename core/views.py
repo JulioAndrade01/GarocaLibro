@@ -12,7 +12,6 @@ from django.utils.timezone import make_aware
 from datetime import datetime, date
 from django.http import JsonResponse
 
-
 # Configura o logger
 logger = logging.getLogger(__name__)
 
@@ -120,7 +119,7 @@ def register(request):
 
 
 # Função de login
-
+from django.http import HttpResponse
 
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -136,36 +135,24 @@ def login_view(request):
             else:
                 messages.error(request, "Credenciais inválidas.")
                 
+    # Renderiza o formulário de login
     response = render(request, 'login.html', {'form': form})
     
     # Desabilitar cache para a página de login
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
     
     return response
-
 
 
 # Função para exibir perfil do usuário logado
-def login_view(request):
-    form = LoginForm(request.POST or None)
-    
-    if request.method == "POST":
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = authenticate(request, email=email, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('perfil')
-            else:
-                messages.error(request, "Credenciais inválidas.")
-                
-    response = render(request, 'login.html', {'form': form})
-    
-    # Desabilitar cache para a página de login
-    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
-    
-    return response
+@login_required
+def perfil_view(request):
+    try:
+        leitor = get_object_or_404(Leitor, email=request.user.email)
+        return render(request, 'perfil.html', {'leitor': leitor})
+    except Exception as e:
+        logger.error(f"Erro ao carregar o perfil: {str(e)}")
+        return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
 
 
 # Função para editar perfil
