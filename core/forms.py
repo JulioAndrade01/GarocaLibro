@@ -107,7 +107,6 @@ class EmprestimoModelForm(forms.ModelForm):
         }
 
 class LoginForm(forms.Form):
-    """Formulário para login de leitor."""    
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
             'class': 'form-control',

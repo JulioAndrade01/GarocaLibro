@@ -6,6 +6,7 @@ Django==4.2.16
 django-bootstrap-v5==1.0.11
 django-stdimage==6.0.1
 gunicorn==20.1.0
+mysql-connector-python==9.1.0
 mysqlclient==2.2.4
 Pillow==9.2.0
 psycopg2-binary==2.9
@@ -14,3 +15,4 @@ sqlparse==0.4.2
 static3==0.7.0
 typing_extensions==4.12.2
 tzdata==2024.1
+whitenoise==6.7.0
