@@ -34,6 +34,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'library_manager.settings.CacheControlMiddleware',  # Middleware personalizado
 ]
 
 # Configuração de URLs e WSGI
@@ -68,9 +69,10 @@ DATABASES = {
     }
 }
 
+# Conexão com o banco JawsDB no Heroku
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
-    DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
+    DATABASES['default'] = dj_database_url.config(default=ja_database_url)
 elif DEBUG:
     DATABASES['default'].update({
         'NAME': 'DJANGO_G',
@@ -78,11 +80,9 @@ elif DEBUG:
         'PASSWORD': '100902',
         'HOST': 'localhost',
         'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
     })
+else:
+    raise ValueError("JAWSDB_URL environment variable is not set in production mode")
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
@@ -110,13 +110,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+# Configurações AWS para ambiente de produção
 if not DEBUG:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -136,13 +136,13 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil/'
 LOGOUT_REDIRECT_URL = '/login/'
 
+# Segurança de cookies e headers
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
-
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
@@ -161,11 +161,9 @@ class CacheControlMiddleware(MiddlewareMixin):
         else:
             # Cache curto para outras páginas
             patch_cache_control(response, public=True, max_age=180)
-
         return response
 
-MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
-
+# Configuração de logs
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
