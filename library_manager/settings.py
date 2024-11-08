@@ -3,15 +3,12 @@ import os
 import dj_database_url
 from django.core.management.utils import get_random_secret_key
 
-# Diretório base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
 
-# Configuração dos apps do Django
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,7 +21,6 @@ INSTALLED_APPS = [
     'storages',
 ]
 
-# Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -34,14 +30,12 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'library_manager.settings.CacheControlMiddleware',  # Middleware personalizado
+    'library_manager.settings.CacheControlMiddleware',
 ]
 
-# Configuração de URLs e WSGI
 ROOT_URLCONF = 'library_manager.urls'
 WSGI_APPLICATION = 'library_manager.wsgi.application'
 
-# Configuração de templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -58,7 +52,6 @@ TEMPLATES = [
     },
 ]
 
-# Configuração do banco de dados
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -86,7 +79,7 @@ else:
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
-# Configuração de cache
+# Cache e sessão
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -96,27 +89,7 @@ CACHES = {
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = True
-USE_TZ = True
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-
-# Configurações AWS para ambiente de produção
+# Configuração AWS para ambiente de produção
 if not DEBUG:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -126,44 +99,11 @@ if not DEBUG:
     AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+else:
+    MEDIA_URL = '/media/'
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-DEFAULT_CHARSET = 'utf-8'
-
-AUTH_USER_MODEL = 'core.Leitor'
-
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/perfil/'
-LOGOUT_REDIRECT_URL = '/login/'
-
-# Segurança de cookies e headers
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_SSL_REDIRECT = not DEBUG
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
-SECURE_HSTS_PRELOAD = not DEBUG
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-
-# Middleware para controle de cache personalizado
-from django.utils.cache import patch_cache_control
-from django.utils.deprecation import MiddlewareMixin
-
-class CacheControlMiddleware(MiddlewareMixin):
-    def process_response(self, request, response):
-        if request.path.startswith('/login/') or request.path.startswith('/perfil/'):
-            # Evita cache em páginas dinâmicas de login e perfil
-            patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
-        elif request.path.startswith('/static/'):
-            # Cache prolongado para arquivos estáticos
-            patch_cache_control(response, public=True, max_age=WHITENOISE_MAX_AGE, immutable=True)
-        else:
-            # Cache curto para outras páginas
-            patch_cache_control(response, public=True, max_age=180)
-        return response
-
-# Configuração de logs
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
