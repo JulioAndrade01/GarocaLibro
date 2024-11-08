@@ -171,10 +171,15 @@ from django.utils.deprecation import MiddlewareMixin
 
 class CacheControlMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
+        # Evita cache na página de login
+        if request.path.startswith('/login/'):
+            patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+        else:
+            # Para outras páginas, permite cache
+            patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
         return response
 
-# Adicione CacheControlMiddleware ao final da lista de middlewares
+# Adiciona ao final da lista de middlewares
 MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
 
 # Logging Configurations
