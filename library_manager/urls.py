@@ -25,3 +25,5 @@ urlpatterns = [
     path('core/', include('core.urls')),  # Incluindo as URLs do app core sob o prefixo 'core/'
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

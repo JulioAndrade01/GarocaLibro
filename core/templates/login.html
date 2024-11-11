@@ -1,13 +1,22 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- Meta viewport para garantir responsividade em dispositivos móveis -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Link para o CSS do Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-pzjw8f+ua7Kw1TIq0v8FqC5e4pUm8VfYYc9v+hJ3DHTK5tO1R6xyL1HnJWeScX2V" crossorigin="anonymous">
+    
+    <!-- Link para CSS personalizado com a tag estática do Django -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    
     <style>
         body {
-            background-image: url('../../media/cp.jpg'); 
+            /* Carrega a imagem de fundo de forma compatível com o Django */
+            background-image: url("{% static 'images/cp.jpg' %}"); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -23,6 +32,9 @@
             border-radius: 8px;
             background-color: #ffffff;
         }
+        .form-control {
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -32,16 +44,39 @@
 
             <!-- Formulário de login -->
             <form method="post" action="{% url 'login' %}">
-                {% csrf_token %}
-                
-                <!-- Renderiza os campos do formulário com o template Django -->
-                {{ form.as_p }}
-                
+                {% csrf_token %} <!-- Token CSRF obrigatório para POST seguro -->
+
+                <!-- Campo de Email -->
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.email.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Campo de Senha -->
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.password.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
                 <!-- Botão de envio -->
                 <button type="submit" class="btn btn-primary btn-block">Entrar</button>
             </form>
 
-            <!-- Exibe mensagens de erro, se houver -->
+            <!-- Exibe mensagens gerais de erro -->
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-danger mt-3">{{ message }}</div>
@@ -56,8 +91,8 @@
     </div>
 
     <!-- Scripts JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- Remover jQuery slim se não for necessário para seu projeto -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0v8FqC5e4pUm8VfYYc9v+hJ3DHTK5tO1R6xyL1HnJWeScX2V" crossorigin="anonymous"></script>
 </body>
 </html>

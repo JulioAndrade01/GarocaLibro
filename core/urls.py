@@ -1,5 +1,7 @@
-
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 from core.views import (
     IndexView,
     LeitorListView,
@@ -17,7 +19,6 @@ from core.views import (
     perfil_view,
     register,
     agendar_retirada,
-    
 )
 
 urlpatterns = [
@@ -37,6 +38,10 @@ urlpatterns = [
     path('perfil/', perfil_view, name='perfil'),
     path('meu_perfil/', perfil_view, name='meu_perfil'),
     path('login/', login_view, name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
