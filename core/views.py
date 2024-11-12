@@ -117,7 +117,7 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('perfil')
+            return redirect('meu_perfil')
         else:
             messages.error(request, "Credenciais inválidas.")
     
@@ -127,10 +127,10 @@ def login_view(request):
 
 # Função para exibir perfil do usuário logado
 @login_required
-def perfil_view(request):
+def meu_perfil_view(request):
     try:
         leitor = get_object_or_404(Leitor, email=request.user.email)
-        return render(request, 'perfil.html', {'leitor': leitor})
+        return render(request, 'meu_perfil.html', {'leitor': leitor})
     except Exception as e:
         logger.error(f"Erro ao carregar o perfil: {str(e)}")
         return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
@@ -144,7 +144,7 @@ def editar_perfil_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
-            return redirect('perfil')
+            return redirect('meu_perfil')
     else:
         form = LeitorModelForm(instance=leitor)
     return render(request, 'editar_perfil.html', {'form': form})
