@@ -19,12 +19,12 @@ from core.views import (
     perfil_view,
     register,
     agendar_retirada,
-    home_view,  # Certifique-se de que home_view existe e aponta para home.html
+    home_view,  # Mantém home_view
 )
 
 urlpatterns = [
-    path('', home_view, name='home'),  # Define home_view como a página principal
-    path('appgaroca/', AppGarocaView.as_view(), name='appgaroca'),  # Nova rota para appgaroca
+    path('', home_view, name='home'),  # A URL principal agora está correta
+    path('appgaroca/', AppGarocaView.as_view(), name='appgaroca'),
     path('leitores/', LeitorListView.as_view(), name='leitor-list'),
     path('leitor/add/', LeitorCreateView.as_view(), name='leitor-create'),
     path('leitor/edit/<int:pk>/', LeitorUpdateView.as_view(), name='leitor-update'),
