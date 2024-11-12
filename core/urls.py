@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from core.views import (
-    IndexView,
+    AppGarocaView,
     LeitorListView,
     LeitorCreateView,
     LeitorUpdateView,
@@ -19,11 +19,12 @@ from core.views import (
     perfil_view,
     register,
     agendar_retirada,
+    home_view,  # Certifique-se de que home_view existe e aponta para home.html
 )
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
-    path('', IndexView.as_view(), name='biblioteca_municipal_sao_sebastiao'),
+    path('', home_view, name='home'),  # Define home_view como a página principal
+    path('appgaroca/', AppGarocaView.as_view(), name='appgaroca'),  # Nova rota para appgaroca
     path('leitores/', LeitorListView.as_view(), name='leitor-list'),
     path('leitor/add/', LeitorCreateView.as_view(), name='leitor-create'),
     path('leitor/edit/<int:pk>/', LeitorUpdateView.as_view(), name='leitor-update'),
