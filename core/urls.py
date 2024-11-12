@@ -24,7 +24,7 @@ from core.views import (
 )
 
 urlpatterns = [
-    path('', home_view, name='home'),  # A URL principal agora está correta
+    path('', home_view, name='home'),  
     path('appgaroca/', AppGarocaView.as_view(), name='appgaroca'),
     path('leitores/', LeitorListView.as_view(), name='leitor-list'),
     path('leitor/add/', LeitorCreateView.as_view(), name='leitor-create'),
