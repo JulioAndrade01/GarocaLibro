@@ -21,8 +21,8 @@ from core.views import home_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home_view.as_view(), name='home'),  # Definindo a URL 'home'
-    path('core/', include('core.urls')),  # Incluindo as URLs do app core sob o prefixo 'core/'
+    path('', home_view, name='home'),,  
+    path('core/', include('core.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
