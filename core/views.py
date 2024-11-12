@@ -15,6 +15,7 @@ from core.models import Emprestimo, Leitor, Livro, Agendamento
 logger = logging.getLogger(__name__)
 
 # Página principal - Home
+
 def home_view(request):
     return render(request, 'home.html')
 
