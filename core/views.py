@@ -117,8 +117,7 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 # Função de login
-# Função de login
-@login_required
+
 def login_view(request):
     form = LoginForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -127,8 +126,7 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            next_url = request.GET.get('next', 'meu_perfil')  # Pega o próximo URL ou 'perfil' por padrão
-            return redirect(next_url)
+            return redirect('meu_perfil')
         else:
             messages.error(request, "Credenciais inválidas.")
     
