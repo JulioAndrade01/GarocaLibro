@@ -3,7 +3,7 @@ from datetime import datetime, date
 from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -108,10 +108,9 @@ def register(request):
         form = LeitorModelForm(request.POST)
         if form.is_valid():
             leitor = form.save(commit=False)
-            leitor.telefone = 'Desconhecido'
-            leitor.set_password(form.cleaned_data['password'])
+            leitor.set_password(form.cleaned_data['password'])  # Garante que a senha seja criptografada
             leitor.save()
-            login(request, leitor)
+            login(request, leitor.user)  # Login do usuário após o registro
             return redirect('home')
     else:
         form = LeitorModelForm()
@@ -124,13 +123,12 @@ def login_view(request):
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(request, username=email, password=password)  # Aqui, usaremos o username, ou modifique para email
         if user is not None:
             login(request, user)
             return redirect('meu_perfil')
         else:
             messages.error(request, "Credenciais inválidas.")
-    
     response = render(request, 'login.html', {'form': form})
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
     return response
@@ -139,11 +137,12 @@ def login_view(request):
 @login_required
 def meu_perfil_view(request):
     try:
-        leitor = get_object_or_404(Leitor, email=request.user.email)
+        leitor = get_object_or_404(Leitor, user=request.user)  # Mudança para buscar pelo user
         return render(request, 'meu_perfil.html', {'leitor': leitor})
     except Exception as e:
         logger.error(f"Erro ao carregar o perfil: {str(e)}")
         return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
+
 
 # Função para editar perfil
 @login_required
@@ -200,4 +199,6 @@ def agendar_retirada(request):
 def success(request):
     return render(request, 'success.html')
 # Função para exibir as perguntas frequentes (FAQ)
-
+def logout_view(request):
+    logout(request)
+    return redirect('home')  
