@@ -177,7 +177,7 @@ def api_leitor(request):
 # Função para agendar retirada de livros
 @login_required
 def agendar_retirada(request):
-    livros_list = Livro.objects.filter(status=True)
+    livros_list = Livro.objects.filter(status=True)  # Pega apenas livros disponíveis
     if request.method == 'POST':
         form = AgendamentoForm(request.POST)
         if form.is_valid():
@@ -186,14 +186,19 @@ def agendar_retirada(request):
                 agendamento = form.save(commit=False)
                 agendamento.leitor = request.user
                 agendamento.save()
-                livro_selecionado.status = False
-                livro_selecionado.save()
-                return redirect('meu_perfil')
+                livro_selecionado.status = False  # Marque o livro como reservado
+                livro_selecionado.save()  # Salve a alteração no banco
+                messages.success(request, 'Livro agendado com sucesso!')
+                return redirect('meu_perfil')  # Redireciona para o perfil do usuário
             else:
                 form.add_error('livro', 'Este livro já foi reservado.')
+                messages.error(request, 'Este livro não está disponível.')
+        else:
+            messages.error(request, 'Erro ao agendar o livro.')
     else:
         form = AgendamentoForm()
     return render(request, 'agendar_retirada.html', {'form': form, 'livros_list': livros_list})
+
 
 # Função de sucesso ao agendar retirada
 def success(request):
