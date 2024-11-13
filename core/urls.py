@@ -50,7 +50,7 @@ urlpatterns = [
     path('success/', success, name='success'),
     path('noticias/', views.noticias, name='noticias'),  
     path('faq/', FAQ, name='faq'),
-    path('contato/', views.contato, name='contato'),  
+    path('contato/', Contato, name='contato'),  
 ]
 
 if settings.DEBUG:
