@@ -94,8 +94,10 @@ class EmprestimoCreateView(CreateView):
 # Visualização de reservas
 @login_required
 def reservas_view(request):
-    reservas = Emprestimo.objects.filter(leitor=request.user.leitor)
+    leitor = get_object_or_404(Leitor, email=request.user.email)
+    reservas = Emprestimo.objects.filter(leitor=leitor)
     return render(request, 'reservas.html', {'reservas': reservas})
+
 
 # Listagem de livros
 def livros_view(request):
@@ -110,14 +112,13 @@ def register(request):
             leitor = form.save(commit=False)
             leitor.set_password(form.cleaned_data['password'])  # Garante que a senha seja criptografada
             leitor.save()
-            login(request, leitor.user)  # Login do usuário após o registro
+            login(request, leitor)  # Login do usuário após o registro
             return redirect('home')
     else:
         form = LeitorModelForm()
     return render(request, 'register.html', {'form': form})
 
 # Função de login
-
 def login_view(request):
     form = LoginForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -139,7 +140,7 @@ def login_view(request):
 @login_required
 def meu_perfil_view(request):
     try:
-        leitor = get_object_or_404(Leitor, user=request.user)  # Mudança para buscar pelo user
+        leitor = get_object_or_404(Leitor, email=request.user.email)
         return render(request, 'meu_perfil.html', {'leitor': leitor})
     except Exception as e:
         logger.error(f"Erro ao carregar o perfil: {str(e)}")
@@ -159,6 +160,7 @@ def editar_perfil_view(request):
     else:
         form = LeitorModelForm(instance=leitor)
     return render(request, 'editar_perfil.html', {'form': form})
+
 
 # API para retornar dados do leitor
 @login_required
@@ -186,7 +188,7 @@ def agendar_retirada(request):
             livro_selecionado = form.cleaned_data['livro']
             if livro_selecionado.status:
                 agendamento = form.save(commit=False)
-                agendamento.leitor = request.user
+                agendamento.leitor = get_object_or_404(Leitor, email=request.user.email)
                 agendamento.save()
                 livro_selecionado.status = False  # Marque o livro como reservado
                 livro_selecionado.save()  # Salve a alteração no banco
