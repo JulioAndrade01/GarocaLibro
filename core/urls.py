@@ -43,7 +43,7 @@ urlpatterns = [
     path('livros/view/', livros_view, name='livros-view'),
     #path('perfil/', perfil_view, name='perfil'),
     path('meu_perfil/', meu_perfil_view, name='meu_perfil'),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
