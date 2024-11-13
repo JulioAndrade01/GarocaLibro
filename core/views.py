@@ -189,7 +189,7 @@ def agendar_retirada(request):
                 agendamento.save()
                 livro_selecionado.status = False
                 livro_selecionado.save()
-                return redirect('perfil')
+                return redirect('meu_perfil')
             else:
                 form.add_error('livro', 'Este livro já foi reservado.')
     else:

@@ -137,7 +137,7 @@ DEFAULT_CHARSET = 'utf-8'
 AUTH_USER_MODEL = 'core.Leitor'
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/perfil/'
+LOGIN_REDIRECT_URL = '/meu_perfil/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # Configuração de cookies para segurança em produção
