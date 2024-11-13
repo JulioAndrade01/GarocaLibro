@@ -134,69 +134,69 @@
 
     <!-- FAQ -->
     <div class="accordion" id="accordionFAQ">
-        {% for faq in faqs %}
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
-                    {{ faq.pergunta }}
-                </button>
-            </h2>
-            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionFAQ">
-                <div class="accordion-body">
-                    {{ faq.resposta }}
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="text-center">Nenhuma pergunta frequente disponível no momento.</div>
-        {% endfor %}
-    
-        <!-- Conteúdo fixo das perguntas frequentes (sempre será mostrado no final) -->
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOneStatic">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseOneStatic" aria-expanded="true" aria-controls="collapseOneStatic">
-                    O que é a Biblioteca Municipal de São Sebastião?
-                </button>
-            </h2>
-            <div id="collapseOneStatic" class="accordion-collapse collapse show" aria-labelledby="headingOneStatic" data-bs-parent="#accordionFAQ">
-                <div class="accordion-body">
-                    A Biblioteca e Videoteca Municipal Álvaro Dória Orselli é um centro de acesso a livros e
-                    filmes, com o objetivo de promover o conhecimento e a cultura à população local.
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwoStatic">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseTwoStatic" aria-expanded="false" aria-controls="collapseTwoStatic">
-                    Como posso fazer meu cadastro na biblioteca?
-                </button>
-            </h2>
-            <div id="collapseTwoStatic" class="accordion-collapse collapse" aria-labelledby="headingTwoStatic" data-bs-parent="#accordionFAQ">
-                <div class="accordion-body">
-                    O cadastro pode ser feito diretamente na biblioteca, levando um documento de identidade e
-                    comprovante de residência, ou você pode se cadastrar online em nosso portal.
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingThreeStatic">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseThreeStatic" aria-expanded="false" aria-controls="collapseThreeStatic">
-                    Quais são os serviços oferecidos pela biblioteca?
-                </button>
-            </h2>
-            <div id="collapseThreeStatic" class="accordion-collapse collapse" aria-labelledby="headingThreeStatic" data-bs-parent="#accordionFAQ">
-                <div class="accordion-body">
-                    A biblioteca oferece empréstimos de livros, filmes, acesso à internet, além de eventos
-                    culturais e educativos, como cineclubes e palestras.
-                </div>
+    {% for faq in faqs %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                {{ faq.pergunta }}
+            </button>
+        </h2>
+        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionFAQ">
+            <div class="accordion-body">
+                {{ faq.resposta }}
             </div>
         </div>
     </div>
-    
+    {% empty %}
+    <div class="text-center">Nenhuma pergunta frequente disponível no momento.</div>
+    {% endfor %}
+
+    <!-- Conteúdo fixo das perguntas frequentes (sempre será mostrado no final) -->
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOneStatic">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseOneStatic" aria-expanded="true" aria-controls="collapseOneStatic">
+                O que é a Biblioteca Municipal de São Sebastião?
+            </button>
+        </h2>
+        <div id="collapseOneStatic" class="accordion-collapse collapse show" aria-labelledby="headingOneStatic" data-bs-parent="#accordionFAQ">
+            <div class="accordion-body">
+                A Biblioteca e Videoteca Municipal Álvaro Dória Orselli é um centro de acesso a livros e
+                filmes, com o objetivo de promover o conhecimento e a cultura à população local.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwoStatic">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseTwoStatic" aria-expanded="false" aria-controls="collapseTwoStatic">
+                Como posso fazer meu cadastro na biblioteca?
+            </button>
+        </h2>
+        <div id="collapseTwoStatic" class="accordion-collapse collapse" aria-labelledby="headingTwoStatic" data-bs-parent="#accordionFAQ">
+            <div class="accordion-body">
+                O cadastro pode ser feito diretamente na biblioteca, levando um documento de identidade e
+                comprovante de residência, ou você pode se cadastrar online em nosso portal.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThreeStatic">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseThreeStatic" aria-expanded="false" aria-controls="collapseThreeStatic">
+                Quais são os serviços oferecidos pela biblioteca?
+            </button>
+        </h2>
+        <div id="collapseThreeStatic" class="accordion-collapse collapse" aria-labelledby="headingThreeStatic" data-bs-parent="#accordionFAQ">
+            <div class="accordion-body">
+                A biblioteca oferece empréstimos de livros, filmes, acesso à internet, além de eventos
+                culturais e educativos, como cineclubes e palestras.
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- CONTATO -->
     <section class="py-5" id="contato">
         <div class="container">

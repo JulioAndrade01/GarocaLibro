@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 def home_view(request):
     # Carregar notícias e FAQs do banco de dados
     noticias = Noticia.objects.all()
-    faqs = FAQ.objects.all()  # Carregar todas as FAQs
-    return render(request, 'home.html', {'noticias': noticias, 'faqs': faqs})
+    faq = FAQ.objects.all()  # Carregar todas as FAQs
+    return render(request, 'home.html', {'noticias': noticias, 'faq': faq})
 
 
 # Função para exibir as notícias

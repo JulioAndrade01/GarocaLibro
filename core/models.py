@@ -153,7 +153,7 @@ class Noticia(models.Model):
         return self.titulo
     
 class FAQ(models.Model):
-    pergunta = models.CharField(max_length=200)
+    pergunta = models.CharField(max_length=255)
     resposta = models.TextField()
 
     def __str__(self):

@@ -45,9 +45,9 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
     path('success/', success, name='success'),
-    path('noticias/', views.noticias, name='noticias'),  # Notícias
-    path('faq/', views.faq, name='faq'),  # Perguntas Frequentes
-    path('contato/', views.contato, name='contato'),  # Contato
+    path('noticias/', views.noticias, name='noticias'),  
+    path('faq/', views.faq, name='faq'),  
+    path('contato/', views.contato, name='contato'),  
 ]
 
 if settings.DEBUG:
