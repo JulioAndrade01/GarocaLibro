@@ -136,7 +136,7 @@ DEFAULT_CHARSET = 'utf-8'
 # Configuração de usuários e autenticação
 AUTH_USER_MODEL = 'core.Leitor'
 
-LOGIN_URL = '/core/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/meu_perfil/'
 LOGOUT_REDIRECT_URL = '/login/'
 
