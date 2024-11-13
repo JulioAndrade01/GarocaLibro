@@ -21,6 +21,11 @@ def home_view(request):
     faqs = FAQ.objects.all()
     return render(request, 'home.html', {'noticias': noticias, 'faqs': faqs})
 
+# Função para exibir as notícias
+def noticias(request):
+    noticias = Noticia.objects.all()  # Pega todas as notícias do banco
+    return render(request, 'noticias.html', {'noticias': noticias})
+
 # Página adicional renomeada - AppGaroca
 class AppGarocaView(TemplateView):
     template_name = 'appgaroca.html'
