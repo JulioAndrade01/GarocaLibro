@@ -9,14 +9,17 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.timezone import make_aware
 from core.forms import LoginForm, LeitorModelForm, AgendamentoForm
-from core.models import Emprestimo, Leitor, Livro, Agendamento
+from core.models import Emprestimo, Leitor, Livro, Agendamento, Noticia, FAQ, Contato  # Adicione modelos de Noticia e FAQ
 
 # Configura o logger
 logger = logging.getLogger(__name__)
 
 # Página principal - Home
 def home_view(request):
-    return render(request, 'home.html')
+    # Carregar notícias e FAQs do banco de dados
+    noticias = Noticia.objects.all()
+    faqs = FAQ.objects.all()
+    return render(request, 'home.html', {'noticias': noticias, 'faqs': faqs})
 
 # Página adicional renomeada - AppGaroca
 class AppGarocaView(TemplateView):
@@ -108,6 +111,7 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 # Função de login
+@login_required
 def login_view(request):
     form = LoginForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -116,7 +120,7 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('meu_perfil')  # Alterado para redirecionar para meu_perfil
+            return redirect('meu_perfil')
         else:
             messages.error(request, "Credenciais inválidas.")
     
@@ -129,7 +133,7 @@ def login_view(request):
 def meu_perfil_view(request):
     try:
         leitor = get_object_or_404(Leitor, email=request.user.email)
-        return render(request, 'meu_perfil.html', {'leitor': leitor})  # Alterado para usar meu_perfil.html
+        return render(request, 'meu_perfil.html', {'leitor': leitor})
     except Exception as e:
         logger.error(f"Erro ao carregar o perfil: {str(e)}")
         return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
@@ -143,7 +147,7 @@ def editar_perfil_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
-            return redirect('meu_perfil')  # Alterado para redirecionar para meu_perfil
+            return redirect('meu_perfil')
     else:
         form = LeitorModelForm(instance=leitor)
     return render(request, 'editar_perfil.html', {'form': form})
@@ -178,7 +182,7 @@ def agendar_retirada(request):
                 agendamento.save()
                 livro_selecionado.status = False
                 livro_selecionado.save()
-                return redirect('perfil')  # Alterado para redirecionar para meu_perfil
+                return redirect('perfil')
             else:
                 form.add_error('livro', 'Este livro já foi reservado.')
     else:
