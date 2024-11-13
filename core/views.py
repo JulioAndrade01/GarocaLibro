@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def home_view(request):
     # Carregar notícias e FAQs do banco de dados
     noticias = Noticia.objects.all()
-    faqs = FAQ.objects.all()
+    faqs = FAQ.objects.all() 
     return render(request, 'home.html', {'noticias': noticias, 'faqs': faqs})
 
 # Função para exibir as notícias
@@ -198,6 +198,4 @@ def agendar_retirada(request):
 def success(request):
     return render(request, 'success.html')
 # Função para exibir as perguntas frequentes (FAQ)
-def faq(request):
-    faqs = FAQ.objects.all()  # Pega todas as perguntas frequentes do banco
-    return render(request, 'faq.html', {'faqs': faqs})
+
