@@ -123,12 +123,13 @@ def login_view(request):
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data['email']
         password = form.cleaned_data['password']
-        user = authenticate(request, username=email, password=password)  # Aqui, usaremos o username, ou modifique para email
+        user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('meu_perfil')
+            return redirect('perfil')
         else:
             messages.error(request, "Credenciais inválidas.")
+    
     response = render(request, 'login.html', {'form': form})
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
     return response
