@@ -22,6 +22,9 @@ from core.views import (
     agendar_retirada,
     home_view,  
     success,
+    noticias,
+    faq,
+    Contato,
 )
 
 urlpatterns = [
