@@ -197,3 +197,7 @@ def agendar_retirada(request):
 # Função de sucesso ao agendar retirada
 def success(request):
     return render(request, 'success.html')
+# Função para exibir as perguntas frequentes (FAQ)
+def faq(request):
+    faqs = FAQ.objects.all()  # Pega todas as perguntas frequentes do banco
+    return render(request, 'faq.html', {'faqs': faqs})
