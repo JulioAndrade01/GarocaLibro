@@ -25,6 +25,7 @@ from core.views import (
     noticias,
     FAQ ,
     Contato,
+    toggle_favorito,
 )
 
 urlpatterns = [
@@ -51,6 +52,7 @@ urlpatterns = [
     path('noticias/', views.noticias, name='noticias'),  
     path('faq/', FAQ, name='faq'),
     path('contato/', Contato, name='contato'),  
+    path('livro/<int:livro_id>/favorito/', toggle_favorito, name='toggle_favorito'),
 ]
 
 if settings.DEBUG:

@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.utils.timezone import make_aware
 from core.forms import LoginForm, LeitorModelForm, AgendamentoForm
 from core.models import Emprestimo, Leitor, Livro, Agendamento, Noticia, FAQ, Contato  # Adicione modelos de Noticia e FAQ
+from django.views.decorators.http import require_POST
 
 # Configura o logger
 logger = logging.getLogger(__name__)
@@ -211,3 +212,16 @@ def success(request):
 def logout_view(request):
     logout(request)
     return redirect('home')  
+
+@login_required
+@require_POST
+def toggle_favorito(request, livro_id):
+    leitor = get_object_or_404(Leitor, user=request.user)
+    livro = get_object_or_404(Livro, id=livro_id)
+    if livro in leitor.favoritos.all():
+        leitor.favoritos.remove(livro)
+        is_favorito = False
+    else:
+        leitor.favoritos.add(livro)
+        is_favorito = True
+    return JsonResponse({'is_favorito': is_favorito})
