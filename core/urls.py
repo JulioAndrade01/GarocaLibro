@@ -23,7 +23,7 @@ from core.views import (
     home_view,  
     success,
     noticias,
-    faq,
+    FAQ ,
     Contato,
 )
 
@@ -49,7 +49,7 @@ urlpatterns = [
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
     path('success/', success, name='success'),
     path('noticias/', views.noticias, name='noticias'),  
-    path('faq/', views.faq, name='faq'),  
+    path('faq/', FAQ, name='faq'),
     path('contato/', views.contato, name='contato'),  
 ]
 
