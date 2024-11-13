@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from core import views
 from core.views import (
     AppGarocaView,
     LeitorListView,
@@ -44,6 +45,9 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
     path('success/', success, name='success'),
+    path('noticias/', views.noticias, name='noticias'),  # Notícias
+    path('faq/', views.faq, name='faq'),  # Perguntas Frequentes
+    path('contato/', views.contato, name='contato'),  # Contato
 ]
 
 if settings.DEBUG:

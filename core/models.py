@@ -142,3 +142,28 @@ class Agendamento(Base):
 
     def __str__(self):
         return f'{self.leitor.nome} | {self.livro.nome} | {self.data_retirada}'
+
+class Noticia(models.Model):
+    titulo = models.CharField(max_length=200)
+    descricao = models.TextField()
+    link_externo = models.URLField()
+    imagem = models.ImageField(upload_to='noticias/')
+
+    def __str__(self):
+        return self.titulo
+    
+class FAQ(models.Model):
+    pergunta = models.CharField(max_length=200)
+    resposta = models.TextField()
+
+    def __str__(self):
+        return self.pergunta
+    
+class Contato(models.Model):
+    nome = models.CharField(max_length=100)
+    email = models.EmailField()
+    mensagem = models.TextField()
+    data_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.nome} - {self.email}'
