@@ -23,6 +23,7 @@ from core.views import (
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
+    path('', IndexView.as_view(), name='biblioteca_municipal_sao_sebastiao'),
     path('leitores/', LeitorListView.as_view(), name='leitor-list'),
     path('leitor/add/', LeitorCreateView.as_view(), name='leitor-create'),
     path('leitor/edit/<int:pk>/', LeitorUpdateView.as_view(), name='leitor-update'),
@@ -35,6 +36,7 @@ urlpatterns = [
     path('emprestimo/add/', EmprestimoCreateView.as_view(), name='emprestimo-create'),
     path('livros/view/', livros_view, name='livros-view'),
     path('perfil/', perfil_view, name='perfil'),
+    path('meu_perfil/', perfil_view, name='meu_perfil'),
     path('login/', login_view, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),

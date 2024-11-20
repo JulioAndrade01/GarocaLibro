@@ -8,9 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
-#DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-DEBUG=True
-# ALLOWED_HOSTS com os valores para ambiente local e Heroku
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'  # Alterado para usar variável de ambiente
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Configuração dos apps do Django
@@ -24,14 +22,13 @@ INSTALLED_APPS = [
     'core',
     'bootstrap5',
     'storages',  # django-storages para integração com AWS S3
-    'csp',  # Adicionado para Content Security Policy
+    'csp',  # Adicionado para Content Security Policy (se for necessário)
 ]
 
 # Configuração do middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para arquivos estáticos
-    'csp.middleware.CSPMiddleware',  # Adicionado para Content Security Policy
     'django.middleware.http.ConditionalGetMiddleware',  # Middleware condicional para cache
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -39,6 +36,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
+
+# Se não for necessário CSP, remova a linha abaixo
+# 'csp.middleware.CSPMiddleware', 
 
 # Configuração de URLs e WSGI
 ROOT_URLCONF = 'library_manager.urls'
@@ -77,12 +77,12 @@ ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
     DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
 else:
-    # Banco de dados local
+    # Banco de dados local (apenas para DEBUG = True)
     if DEBUG:
         DATABASES['default'].update({
             'NAME': 'DJANGO_G',
-            'USER': 'djangoadmin',  # ou o usuário correto
-            'PASSWORD': '100902',  # a senha correta do banco de dados
+            'USER': 'djangoadmin',
+            'PASSWORD': '100902',
             'HOST': 'localhost',
             'PORT': '3306',
             'OPTIONS': {
@@ -93,7 +93,7 @@ else:
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
-# Configuração de cache usando apenas LocMemCache
+# Configuração de cache (apenas para ambiente local)
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -120,8 +120,16 @@ USE_TZ = True
 
 # Configuração de arquivos estáticos
 STATIC_URL = '/static/'
+
+# Diretório para os arquivos estáticos gerados
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+# Configuração do Whitenoise para arquivos estáticos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Adicionando cabeçalhos de cache
+WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
 
 # Configuração de arquivos de mídia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -154,22 +162,16 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 # Segurança dos cookies e HTTPS
 SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = not DEBUG
-SECURE_SSL_REDIRECT = not DEBUG
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_SSL_REDIRECT = not DEBUG  # Redireciona HTTP para HTTPS
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 ano de segurança
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
+
 
 # Cabeçalhos de segurança
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-
-# Configuração para Content-Security-Policy (CSP)
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com', 'https://code.jquery.com')
-CSP_STYLE_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com')
-CSP_FRAME_ANCESTORS = ("'self'",)
 
 # Middleware para adicionar cabeçalho Cache-Control simplificado
 from django.utils.cache import patch_cache_control
@@ -177,10 +179,21 @@ from django.utils.deprecation import MiddlewareMixin
 
 class CacheControlMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
+        # Evita cache na página de login
+        if request.path.startswith('/login/'):
+            patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+        else:
+            # Para outras páginas, permite cache
+            patch_cache_control(response, public=True, max_age=86400)  # 1 dia de cache
+
+        # Cabeçalhos para arquivos estáticos
+        if request.path.startswith('/static/'):
+            patch_cache_control(response, public=True, max_age=WHITENOISE_MAX_AGE, immutable=True)
+
         return response
 
-# Adicione CacheControlMiddleware ao final da lista de middlewares
+
+# Adiciona ao final da lista de middlewares
 MIDDLEWARE.append('library_manager.settings.CacheControlMiddleware')
 
 # Logging Configurations
@@ -190,7 +203,7 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG'
+            'level': 'DEBUG' if DEBUG else 'ERROR',
         },
     },
     'root': {
