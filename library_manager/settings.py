@@ -64,11 +64,12 @@ TEMPLATES = [
 # Configuração do banco de dados
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
-            'charset': 'utf8mb4',
-        }
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.getenv('POSTGRES_DB', 'postgres'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -78,7 +79,7 @@ if ja_database_url:
     DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
 else:
     # Banco de dados local
-    if DEBUG:
+    if DEBUG and os.getenv('DB_ENGINE', '') == 'django.db.backends.mysql':
         DATABASES['default'].update({
             'NAME': 'DJANGO_G',
             'USER': 'djangoadmin',  # ou o usuário correto
