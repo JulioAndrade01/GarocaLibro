@@ -13,12 +13,10 @@ django-storages==1.14.4
 django_csp==3.8
 gunicorn==20.1.0
 jmespath==1.0.1
-mysql-connector-python==9.1.0
-mysqlclient==2.2.5
 Pillow==9.2.0
-psycopg2-binary==2.9
 python-dateutil==2.9.0.post0
-s3transfer==0.10.3
+s3transfer==0.10
+psycopg2-binary==2.9.10
 six==1.16.0
 soupsieve==2.3.2.post1
 sqlparse==0.4.2

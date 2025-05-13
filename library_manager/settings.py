@@ -8,7 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuração de segurança
 SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
-DEBUG = True
+#DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG=True
+# ALLOWED_HOSTS com os valores para ambiente local e Heroku
 ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Configuração dos apps do Django
@@ -20,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'library_app',
     'bootstrap5',
     'storages',  # Adicionando o django-storages para integração com o S3
 ]
@@ -60,27 +63,32 @@ TEMPLATES = [
 # Configuração do banco de dados
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
-            'charset': 'utf8mb4',
-        }
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.getenv('POSTGRES_DB', 'postgres'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
 ja_database_url = os.getenv('JAWSDB_URL')
 if ja_database_url:
-    DATABASES['default'] = dj_database_url.config(default=ja_database_url)
-elif DEBUG:
-    DATABASES['default'].update({
-        'NAME': 'DJANGO_G',
-        'USER': 'djangoadmin',
-        'PASSWORD': '100902',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    })
+    DATABASES['default'].update(dj_database_url.config(default=ja_database_url))
 else:
-    raise ValueError("JAWSDB_URL environment variable is not set in production mode")
+    # Banco de dados local
+    if DEBUG and os.getenv('DB_ENGINE', '') == 'django.db.backends.mysql':
+        DATABASES['default'].update({
+            'NAME': 'DJANGO_G',
+            'USER': 'djangoadmin',  # ou o usuário correto
+            'PASSWORD': '100902',  # a senha correta do banco de dados
+            'HOST': 'localhost',
+            'PORT': '3306',
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+            }
+        })
 
 DATABASES['default']['CONN_MAX_AGE'] = 600
 
