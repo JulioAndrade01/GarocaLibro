@@ -52,7 +52,7 @@
                 <div class="card-body">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i>
-                        Digite o código do livro ou escaneie o código de barras.
+                        Digite o código do livro ou escaneie o código de barras ou NFC.
                     </div>
 
                     <form method="post" class="mb-4">
@@ -73,10 +73,15 @@
                                             id="startScanner">
                                         <i class="fas fa-camera"></i>
                                     </button>
+                                    <button type="button" 
+                                            class="btn btn-outline-success" 
+                                            id="startNFC">
+                                        <i class="fas fa-wifi"></i> NFC
+                                    </button>
                                 </div>
                             </div>
                             <small class="form-text text-muted">
-                                O código do livro pode ser encontrado na primeira página do livro ou escaneado via código de barras.
+                                O código do livro pode ser encontrado na primeira página, escaneado via código de barras ou lido via NFC.
                             </small>
                         </div>
                         <div class="text-center">
@@ -112,8 +117,8 @@
                     <div class="mt-4">
                         <h5>Instruções:</h5>
                         <ol>
-                            <li>Localize o código do livro na primeira página ou o código de barras</li>
-                            <li>Digite o código manualmente ou clique no ícone da câmera para escanear</li>
+                            <li>Localize o código do livro na primeira página, código de barras ou etiqueta NFC</li>
+                            <li>Digite o código manualmente, clique no ícone da câmera para escanear ou no botão NFC para ler</li>
                             <li>Clique em "Devolver Livro"</li>
                             <li>Aguarde a confirmação da devolução</li>
                         </ol>
@@ -134,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const stopButton = document.getElementById('stopScanner');
     const scannerContainer = document.getElementById('scanner-container');
     const codigoInput = document.getElementById('codigo_livro');
+    const nfcButton = document.getElementById('startNFC');
     let scannerActive = false;
     let lastResult = '';
 
@@ -153,6 +159,34 @@ document.addEventListener('DOMContentLoaded', function() {
         scannerContainer.classList.remove('active');
         stopScanner();
     });
+
+    // NFC
+    if (nfcButton) {
+        nfcButton.addEventListener('click', async function() {
+            if ('NDEFReader' in window) {
+                const ndef = new NDEFReader();
+                try {
+                    await ndef.scan();
+                    ndef.onreading = event => {
+                        const decoder = new TextDecoder();
+                        for (const record of event.message.records) {
+                            if (record.recordType === "text") {
+                                const text = decoder.decode(record.data);
+                                console.log("NFC detectado:", text);
+                                codigoInput.value = text;
+                                // Feedback visual
+                                detectedBox.textContent = 'NFC detectado: ' + text;
+                            }
+                        }
+                    };
+                } catch (error) {
+                    alert("Erro ao acessar NFC: " + error);
+                }
+            } else {
+                alert("NFC não suportado neste navegador/dispositivo.");
+            }
+        });
+    }
 
     function startScanner() {
         if (scannerActive) return;
