@@ -14,6 +14,20 @@ class LeitorAdmin(admin.ModelAdmin):
 @admin.register(Livro)
 class LivroAdmin(admin.ModelAdmin):
     list_display = ('codigo', 'nome', 'categoria', 'autor', 'status', 'criado', 'modificado', 'ativo')
+    search_fields = ('nome', 'autor', 'codigo')
+    list_filter = ('status', 'categoria')
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('codigo', 'nome', 'autor', 'categoria')
+        }),
+        ('Capa do Livro', {
+            'fields': ('capa',),
+            'classes': ('wide',)
+        }),
+        ('Status', {
+            'fields': ('status',)
+        }),
+    )
 
 @admin.register(Emprestimo)
 class EmprestimoAdmin(admin.ModelAdmin):

@@ -19,6 +19,8 @@ from core.views import (
     perfil_view,
     register,
     agendar_retirada,
+    api_devolver_livro,
+    devolver_livro_view,
 )
 
 urlpatterns = [
@@ -39,6 +41,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),
     path('agendar-retirada/', agendar_retirada, name='agendar_retirada'),
+    path('api/devolver-livro/<int:emprestimo_id>/', api_devolver_livro, name='api_devolver_livro'),
+    path('devolver-livro/', devolver_livro_view, name='devolver_livro'),
 ]
 
 if settings.DEBUG:

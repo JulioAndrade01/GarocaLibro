@@ -13,9 +13,13 @@ services:
 
   web:
     build: .
-    command: gunicorn library_manager.wsgi:application --bind 0.0.0.0:8000
+    command: >
+      bash -c "python manage.py migrate &&
+               python manage.py runserver_plus 0.0.0.0:8000 --cert-file /certs/cert.pem --key-file /certs/key.pem"
     volumes:
       - .:/app
+      - ./cert.pem:/certs/cert.pem
+      - ./key.pem:/certs/key.pem
     ports:
       - "8000:8000"
     env_file:

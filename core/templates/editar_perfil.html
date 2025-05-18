@@ -5,27 +5,19 @@
     <meta charset="UTF-8">
     <title>Editar Perfil</title>
     <link rel="stylesheet" href="{% static 'core/styles.css' %}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Editar Perfil</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        
-        <label for="id_nome">Nome</label>
-        <input id="id_nome" type="text" name="nome" placeholder="Digite seu nome">
-    
-        <label for="id_telefone">Telefone</label>
-        <input id="id_telefone" type="text" name="telefone" placeholder="Digite seu telefone">
-    
-        <label for="id_endereco">Endereço</label>
-        <input id="id_endereco" type="text" name="endereco" placeholder="Digite seu endereço">
-    
-        <label for="id_foto_perfil">Foto de Perfil</label>
-        <input id="id_foto_perfil" type="file" name="foto_perfil">
-    
-        <button type="submit">Salvar</button>
-    </form>
-    
+    <div class="container mt-5">
+        <h1>Editar Perfil</h1>
+        <form method="post" enctype="multipart/form-data" class="form-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

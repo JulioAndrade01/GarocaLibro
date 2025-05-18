@@ -6,8 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from core.forms import LoginForm, LeitorModelForm, AgendamentoForm
-from core.models import Emprestimo, Leitor, Livro, Agendamento 
+from core.forms import LoginForm, LeitorModelForm, AgendamentoForm, LivroModelForm
+from core.models import Emprestimo, Leitor, Livro 
 from django.utils.timezone import make_aware
 from datetime import datetime, date
 from django.http import JsonResponse
@@ -53,17 +53,24 @@ class LivroListView(TemplateView):
 
 class LivroCreateView(CreateView):
     model = Livro
-    fields = ['codigo', 'nome', 'categoria', 'autor']
+    form_class = LivroModelForm
     template_name = 'livro.html'
     success_url = reverse_lazy('livro-list')
+
+    def form_valid(self, form):
+        form.instance.capa = self.request.FILES.get('capa')
+        return super().form_valid(form)
 
 
 class LivroUpdateView(UpdateView):
     model = Livro
-    fields = ['codigo', 'nome', 'categoria', 'autor']
+    form_class = LivroModelForm
     template_name = 'livro.html'
     success_url = reverse_lazy('livro-list')
 
+    def form_valid(self, form):
+        if 'capa' in self.request.FILES:
+            form.instance.capa = self.request.FILES['capa']
 
 class LivroDeleteView(DeleteView):
     model = Livro
@@ -174,12 +181,12 @@ def editar_perfil_view(request):
 @login_required
 def api_leitor(request):
     try:
-        leitor = get_object_or_404(Leitor, email=request.user.email)
+        leitor: Leitor = get_object_or_404(Leitor, email=request.user.email)
         dados_leitor = {
             'nome': leitor.nome,
             'email': leitor.email,
             'telefone': leitor.telefone,
-            'foto': leitor.foto.url if leitor.foto else '/static/images/default-profile.png'
+            'foto': leitor.foto_perfil.url if leitor.foto_perfil else '/static/images/default-profile.png'
         }
         return JsonResponse(dados_leitor)
     except Exception as e:
@@ -215,3 +222,70 @@ def agendar_retirada(request):
 # Função de sucesso ao agendar retirada
 def success(request):
     return render(request, 'success.html')
+
+
+# API para devolução de livros
+@login_required
+def api_devolver_livro(request, emprestimo_id):
+    try:
+        emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id, leitor=request.user)
+        
+        if emprestimo.status != 'in_progress':
+            return JsonResponse({'error': 'Este empréstimo já foi finalizado.'}, status=400)
+        
+        # Atualiza o status do empréstimo
+        emprestimo.status = 'completed'
+        emprestimo.save()
+        
+        # Atualiza o status do livro para disponível
+        livro = emprestimo.livro
+        livro.status = True
+        livro.save()
+        
+        return JsonResponse({
+            'message': 'Livro devolvido com sucesso!',
+            'livro': {
+                'id': livro.id,
+                'nome': livro.nome,
+                'status': 'Disponível'
+            }
+        })
+    except Exception as e:
+        logger.error(f"Erro ao processar devolução do livro: {str(e)}")
+        return JsonResponse({'error': 'Erro ao processar a devolução do livro.'}, status=500)
+
+
+# Visualização da página de devolução de livros
+def devolver_livro_view(request):
+    if request.method == 'POST':
+        codigo_livro = request.POST.get('codigo_livro')
+        try:
+            # Busca o livro pelo código
+            livro = get_object_or_404(Livro, codigo=codigo_livro)
+            
+            # Busca o empréstimo ativo deste livro
+            emprestimo = get_object_or_404(
+                Emprestimo,
+                livro=livro,
+                status='in_progress'
+            )
+            
+            # Atualiza o status do empréstimo
+            emprestimo.status = 'completed'
+            emprestimo.save()
+            
+            # Atualiza o status do livro
+            livro.status = True
+            livro.save()
+            
+            messages.success(request, f'Livro "{livro.nome}" devolvido com sucesso!')
+            return redirect('devolver_livro')
+        except Livro.DoesNotExist:
+            messages.error(request, 'Código do livro não encontrado.')
+        except Emprestimo.DoesNotExist:
+            messages.error(request, 'Este livro não está emprestado no momento.')
+        except Exception as e:
+            logger.error(f"Erro ao processar devolução do livro: {str(e)}")
+            messages.error(request, 'Erro ao processar a devolução do livro.')
+    
+    return render(request, 'devolver_livro.html')

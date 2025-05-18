@@ -1,31 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
 {% load bootstrap5 %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Livro</title>
-    {% bootstrap_css %}
-</head>
-<body>
-    <div class="container">
-        <h1>Livro</h1>
-        {% bootstrap_messages %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            
-            <label for="id_nome">Nome</label>
-            <input id="id_nome" type="text" name="nome" placeholder="Digite o nome">
-        
-            <label for="id_telefone">Telefone</label>
-            <input id="id_telefone" type="text" name="telefone" placeholder="Digite o telefone">
-        
-            <button type="submit">Salvar</button>
-        </form>
-        
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{% if object %}Editar{% else %}Novo{% endif %} Livro</h2>
+                </div>
+                <div class="card-body">
+                    {% bootstrap_messages %}
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        
+                        {% if object and object.capa %}
+                            <div class="mb-3">
+                                <label class="form-label">Capa Atual:</label>
+                                <img src="{{ object.capa.url }}" alt="Capa do livro {{ object.nome }}" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                            <a href="{% url 'livro-list' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    {% bootstrap_javascript %}
-</body>
-</html>
+</div>
+{% endblock %}

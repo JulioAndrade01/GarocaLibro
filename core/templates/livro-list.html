@@ -1,12 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Lista de Livros</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Lista de Livros</h2>
+            <a href="{% url 'livro-create' %}" class="btn btn-light">Novo Livro</a>
+        </div>
+        <div class="card-body">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for livro in object_list %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if livro.capa %}
+                                <img src="{{ livro.capa.url }}" class="card-img-top" alt="Capa de {{ livro.nome }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-book fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ livro.nome }}</h5>
+                                <p class="card-text">
+                                    <strong>Autor:</strong> {{ livro.autor }}<br>
+                                    <strong>Categoria:</strong> {{ livro.categoria }}<br>
+                                    <strong>Status:</strong> 
+                                    <span class="badge {% if livro.status %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ livro.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="btn-group w-100">
+                                    <a href="{% url 'livro-update' livro.pk %}" class="btn btn-outline-primary">Editar</a>
+                                    <a href="{% url 'livro-delete' livro.pk %}" class="btn btn-outline-danger">Excluir</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            Nenhum livro cadastrado.
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

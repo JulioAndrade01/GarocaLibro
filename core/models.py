@@ -95,6 +95,7 @@ class Livro(Base):
     autor = models.CharField('Autor', max_length=100, default='Desconhecido')
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     status = models.BooleanField('Status', choices=STATUS_CHOICE, default=True)
+    capa = models.ImageField('Capa do Livro', upload_to='livros/capas/', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Livro'

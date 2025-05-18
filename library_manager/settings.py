@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 #DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 DEBUG=True
 # ALLOWED_HOSTS com os valores para ambiente local e Heroku
-ALLOWED_HOSTS = ['garoca1-3d0d78d257fa.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']  # Allow any host - Note: Not recommended for production
 
 # Configuração dos apps do Django
 INSTALLED_APPS = [
@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'storages',  # django-storages para integração com AWS S3
     'csp',  # Adicionado para Content Security Policy
+    'django_extensions',
 ]
 
 # Configuração do middleware
@@ -168,9 +169,34 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # Configuração para Content-Security-Policy (CSP)
 CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com', 'https://code.jquery.com')
-CSP_STYLE_SRC = ("'self'", 'https://stackpath.bootstrapcdn.com')
+CSP_SCRIPT_SRC = (
+    "'self'",
+    'https://stackpath.bootstrapcdn.com',
+    'https://code.jquery.com',
+    'https://cdn.jsdelivr.net',
+    'https://cdnjs.cloudflare.com',
+    "'unsafe-inline'",  # Permite scripts inline (necessário para <script>...</script>)
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    'https://stackpath.bootstrapcdn.com',
+    'https://cdnjs.cloudflare.com',
+    'https://cdn.jsdelivr.net',
+    "'unsafe-inline'",  # Permite estilos inline
+)
 CSP_FRAME_ANCESTORS = ("'self'",)
+CSP_FONT_SRC = (
+    "'self'",
+    'https://cdnjs.cloudflare.com',
+    'https://cdn.jsdelivr.net',
+    'https://stackpath.bootstrapcdn.com',
+    'data:',
+)
+CSP_IMG_SRC = (
+    "'self'",
+    'blob:',
+    'data:',
+)
 
 # Middleware para adicionar cabeçalho Cache-Control simplificado
 from django.utils.cache import patch_cache_control

@@ -28,7 +28,7 @@ class LeitorModelForm(forms.ModelForm):
     
     class Meta:
         model = Leitor
-        fields = ['nome', 'telefone', 'email', 'password']  # Incluindo 'password'
+        fields = ['nome', 'telefone', 'email', 'password', 'foto_perfil', 'endereco']  # Added foto_perfil and endereco
         widgets = {
             'nome': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -41,6 +41,14 @@ class LeitorModelForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Email do Leitor'
+            }),
+            'foto_perfil': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'  # Only accept image files
+            }),
+            'endereco': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Endereço do Leitor'
             }),
         }
 
@@ -68,7 +76,7 @@ class LivroModelForm(forms.ModelForm):
     
     class Meta:
         model = Livro
-        fields = ['codigo', 'nome', 'categoria', 'autor']
+        fields = ['codigo', 'nome', 'categoria', 'autor', 'capa']
         widgets = {
             'codigo': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -84,6 +92,10 @@ class LivroModelForm(forms.ModelForm):
             'autor': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Autor do Livro'
+            }),
+            'capa': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
             }),
         }
 

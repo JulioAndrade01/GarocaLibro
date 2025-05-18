@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Devolução de Livros - Garoca Libro{% endblock %}
+
+{% block extra_css %}
+<style>
+    #interactive.viewport {
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+    #interactive.viewport > canvas, #interactive.viewport > video {
+        max-width: 100%;
+        width: 100%;
+    }
+    canvas.drawing, canvas.drawingBuffer {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    .scanner-container {
+        display: none;
+        margin-top: 20px;
+    }
+    .scanner-container.active {
+        display: block;
+    }
+    .scanner-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+    }
+    .scanner-overlay.active {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Devolução de Livros</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Digite o código do livro ou escaneie o código de barras.
+                    </div>
+
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="codigo_livro">Código do Livro:</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       class="form-control form-control-lg" 
+                                       id="codigo_livro" 
+                                       name="codigo_livro" 
+                                       placeholder="Digite o código do livro"
+                                       required
+                                       autofocus>
+                                <div class="input-group-append">
+                                    <button type="button" 
+                                            class="btn btn-outline-primary" 
+                                            id="startScanner">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                O código do livro pode ser encontrado na primeira página do livro ou escaneado via código de barras.
+                            </small>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-book"></i> Devolver Livro
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Scanner Container -->
+                    <div id="scanner-container" class="scanner-container">
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Scanner de Código de Barras</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="interactive" class="viewport"></div>
+                                <div class="scanner-overlay">
+                                    <div class="text-center text-white mt-3">
+                                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                        <p class="mt-2">Posicione o código de barras na área de leitura</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button type="button" class="btn btn-secondary btn-block" id="stopScanner">
+                                    <i class="fas fa-times"></i> Fechar Scanner
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>Instruções:</h5>
+                        <ol>
+                            <li>Localize o código do livro na primeira página ou o código de barras</li>
+                            <li>Digite o código manualmente ou clique no ícone da câmera para escanear</li>
+                            <li>Clique em "Devolver Livro"</li>
+                            <li>Aguarde a confirmação da devolução</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<script>
+console.log('JS carregado!');
+document.addEventListener('DOMContentLoaded', function() {
+    const startButton = document.getElementById('startScanner');
+    const stopButton = document.getElementById('stopScanner');
+    const scannerContainer = document.getElementById('scanner-container');
+    const codigoInput = document.getElementById('codigo_livro');
+    let scannerActive = false;
+
+    startButton.addEventListener('click', function() {
+        scannerContainer.classList.add('active');
+        startScanner();
+    });
+
+    stopButton.addEventListener('click', function() {
+        scannerContainer.classList.remove('active');
+        stopScanner();
+    });
+
+    function startScanner() {
+        if (scannerActive) return;
+        
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector("#interactive"),
+                constraints: {
+                    facingMode: "environment"
+                },
+            },
+            decoder: {
+                readers: ["ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader", "upc_reader"]
+            }
+        }, function(err) {
+            if (err) {
+                console.error(err);
+                alert('Erro ao iniciar a câmera. Verifique se você deu permissão para usar a câmera.');
+                return;
+            }
+            scannerActive = true;
+            Quagga.start();
+        });
+
+        Quagga.onDetected(function(result) {
+            if (result.codeResult.code) {
+                codigoInput.value = result.codeResult.code;
+                stopScanner();
+                scannerContainer.classList.remove('active');
+                // Opcional: submeter o formulário automaticamente
+                // document.querySelector('form').submit();
+            }
+        });
+    }
+
+    function stopScanner() {
+        if (!scannerActive) return;
+        Quagga.stop();
+        scannerActive = false;
+    }
+});
+</script>
+{% endblock %} 
