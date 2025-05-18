@@ -135,9 +135,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const scannerContainer = document.getElementById('scanner-container');
     const codigoInput = document.getElementById('codigo_livro');
     let scannerActive = false;
+    let lastResult = '';
+
+    // Elemento para mostrar o código detectado
+    let detectedBox = document.createElement('div');
+    detectedBox.id = 'detected-code-box';
+    detectedBox.style = 'margin-top:10px; font-size:1.2em; color:green; text-align:center;';
+    scannerContainer.appendChild(detectedBox);
 
     startButton.addEventListener('click', function() {
         scannerContainer.classList.add('active');
+        detectedBox.textContent = '';
         startScanner();
     });
 
@@ -160,6 +168,12 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             decoder: {
                 readers: ["ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader", "upc_reader"]
+            },
+            debug: true,
+            locate: true,
+            locator: {
+                patchSize: "medium",
+                halfSample: true
             }
         }, function(err) {
             if (err) {
@@ -171,13 +185,46 @@ document.addEventListener('DOMContentLoaded', function() {
             Quagga.start();
         });
 
+        Quagga.onProcessed(function(result) {
+            var drawingCtx = Quagga.canvas.ctx.overlay,
+                drawingCanvas = Quagga.canvas.dom.overlay;
+            if (result) {
+                if (result.boxes) {
+                    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                    result.boxes.filter(function (box) {
+                        return box !== result.box;
+                    }).forEach(function (box) {
+                        Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {
+                            color: "green",
+                            lineWidth: 2
+                        });
+                    });
+                }
+                if (result.box) {
+                    Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {
+                        color: "blue",
+                        lineWidth: 2
+                    });
+                }
+                if (result.codeResult && result.codeResult.code) {
+                    Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {
+                        color: 'red',
+                        lineWidth: 3
+                    });
+                }
+            }
+        });
+
         Quagga.onDetected(function(result) {
             if (result.codeResult.code) {
-                codigoInput.value = result.codeResult.code;
-                stopScanner();
-                scannerContainer.classList.remove('active');
-                // Opcional: submeter o formulário automaticamente
-                // document.querySelector('form').submit();
+                console.log('Código detectado:', result.codeResult.code);
+                lastResult = result.codeResult.code;
+                detectedBox.textContent = 'Código detectado: ' + lastResult;
+                codigoInput.value = lastResult;
+                setTimeout(() => {
+                    stopScanner();
+                    scannerContainer.classList.remove('active');
+                }, 1000);
             }
         });
     }

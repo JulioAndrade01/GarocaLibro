@@ -197,6 +197,14 @@ CSP_IMG_SRC = (
     'blob:',
     'data:',
 )
+CSP_WORKER_SRC = (
+    "'self'",
+    'blob:',
+)
+CSP_CHILD_SRC = (
+    "'self'",
+    'blob:',
+)
 
 # Middleware para adicionar cabeçalho Cache-Control simplificado
 from django.utils.cache import patch_cache_control
