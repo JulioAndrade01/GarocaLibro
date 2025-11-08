@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}💡 Insights e Tendências - Garoca Libro{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <!-- ========================== -->
+    <!-- CABEÇALHO -->
+    <!-- ========================== -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0">💡 Insights e Tendências</h2>
+        <a href="{% url 'analytics_dashboard' %}" class="btn btn-outline-secondary">
+            ⬅ Voltar ao Painel Analítico
+        </a>
+    </div>
+
+    <!-- ========================== -->
+    <!-- CARDS DE RESUMO -->
+    <!-- ========================== -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="summary-card text-center">
+                <h5>📚 Livros</h5>
+                <span>{{ total_livros|default:"0" }}</span>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="summary-card text-center">
+                <h5>👥 Leitores</h5>
+                <span>{{ total_leitores|default:"0" }}</span>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="summary-card text-center">
+                <h5>📈 Empréstimos</h5>
+                <span>{{ total_emprestimos|default:"0" }}</span>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="summary-card text-center">
+                <h5>🏙️ Bairros Ativos</h5>
+                <span>{{ total_bairros|default:"0" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== -->
+    <!-- GRÁFICO: LIVROS MAIS POPULARES -->
+    <!-- ========================== -->
+    <div class="chart-container">
+        <h5 class="mb-3 text-primary">📖 Livros Mais Emprestados</h5>
+        <canvas id="chartLivros"></canvas>
+    </div>
+
+    <!-- ========================== -->
+    <!-- GRÁFICO: BAIRROS COM MAIS LEITORES -->
+    <!-- ========================== -->
+    <div class="chart-container">
+        <h5 class="mb-3 text-primary">🏙️ Bairros com Mais Leitores</h5>
+        <canvas id="chartBairros"></canvas>
+    </div>
+
+    <!-- ========================== -->
+    <!-- GRÁFICO: EMPRÉSTIMOS MENSAIS -->
+    <!-- ========================== -->
+    <div class="chart-container">
+        <h5 class="mb-3 text-primary">📅 Empréstimos por Mês</h5>
+        <canvas id="chartEmprestimosMensais"></canvas>
+    </div>
+
+    <!-- ========================== -->
+    <!-- SEÇÃO DE INSIGHTS -->
+    <!-- ========================== -->
+    <div class="mt-5">
+        <h4 class="text-secondary mb-3">💬 Recomendações Inteligentes</h4>
+
+        <div class="insight-box">
+            <strong>📊 Análise:</strong> O livro mais emprestado é
+            <strong>{{ top_livros.0.livro__nome|default:"—" }}</strong>,
+            o que indica alto interesse neste título.
+        </div>
+
+        <div class="insight-box">
+            <strong>🏡 Observação:</strong> O bairro com mais leitores é
+            <strong>{{ top_bairros.0.bairro|default:"—" }}</strong>,
+            excelente oportunidade para promoção local.
+        </div>
+
+        <div class="insight-box">
+            <strong>📈 Tendência:</strong> Nos últimos meses,
+            o volume médio de empréstimos aumentou em torno de
+            <strong>{{ emprestimos_mensais|length|add:"%" }}</strong>.
+        </div>
+
+        <div class="insight-box">
+            <strong>💡 Sugestão:</strong> Considere criar campanhas temáticas
+            com os livros mais emprestados ou aumentar exemplares populares.
+        </div>
+    </div>
+</div>
+
+<!-- ========================== -->
+<!-- CHART.JS -->
+<!-- ========================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // ================================
+    // 📘 Livros mais emprestados
+    // ================================
+    const livrosData = {{ top_livros|safe }};
+    const livrosLabels = livrosData.map(item => item.livro__nome);
+    const livrosValues = livrosData.map(item => item.total);
+
+    new Chart(document.getElementById("chartLivros"), {
+        type: 'bar',
+        data: {
+            labels: livrosLabels,
+            datasets: [{
+                label: "Total de Empréstimos",
+                data: livrosValues,
+                backgroundColor: '#0d6efd',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+        }
+    });
+
+    // ================================
+    // 🏙️ Bairros com mais leitores
+    // ================================
+    const bairrosData = {{ top_bairros|safe }};
+    const bairrosLabels = bairrosData.map(item => item.bairro || "Não informado");
+    const bairrosValues = bairrosData.map(item => item.total);
+
+    new Chart(document.getElementById("chartBairros"), {
+        type: 'doughnut',
+        data: {
+            labels: bairrosLabels,
+            datasets: [{
+                data: bairrosValues,
+                backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1'],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+        }
+    });
+
+    // ================================
+    // 📅 Empréstimos por mês
+    // ================================
+    const emprestimosData = {{ emprestimos_mensais|safe }};
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const emprestimosLabels = emprestimosData.map(item => meses[parseInt(item.month) - 1]);
+    const emprestimosValues = emprestimosData.map(item => item.total);
+
+    new Chart(document.getElementById("chartEmprestimosMensais"), {
+        type: 'line',
+        data: {
+            labels: emprestimosLabels,
+            datasets: [{
+                label: "Empréstimos Mensais",
+                data: emprestimosValues,
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

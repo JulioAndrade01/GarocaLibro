@@ -1,12 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Lista de Leitores</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Leitores{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold mb-0">👥 Leitores</h2>
+        <a href="{% url 'leitor-create' %}" class="btn btn-success shadow-sm">
+            ➕ Novo Leitor
+        </a>
+    </div>
+
+    {% if leitores %}
+    <div class="table-responsive shadow-sm rounded-3">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Bairro</th>
+                    <th>Data Cadastro</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leitor in leitores %}
+                <tr>
+                    <td class="text-center">
+    <img src="{{ leitor.foto_url }}" 
+         alt="Foto de Perfil" 
+         class="rounded shadow-sm"
+         style="width: 50px; height: 50px; object-fit: cover;">
+</td>
+
+                    </td>
+                    <td class="fw-semibold">{{ leitor.nome }}</td>
+                    <td>{{ leitor.email }}</td>
+                    <td>{{ leitor.telefone }}</td>
+                    <td>{{ leitor.bairro|default:"—" }}</td>
+                    <td>{{ leitor.criado|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'leitor-update' leitor.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                            ✏️ Editar
+                        </a>
+                        <a href="{% url 'leitor-delete' leitor.pk %}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Tem certeza que deseja excluir {{ leitor.nome }}?')">
+                            🗑️ Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center mt-4 shadow-sm">
+        Nenhum leitor cadastrado no momento.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

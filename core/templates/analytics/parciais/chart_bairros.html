@@ -1,0 +1,37 @@
+<div class="chart-container mt-4">
+    <h5 class="mb-3 text-primary">🏙️ Bairros com mais leitores</h5>
+    <canvas id="chartBairros"></canvas>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const bairrosData = {{ top_bairros|safe }};
+        const labels = bairrosData.map(item => item.bairro || "Não informado");
+        const values = bairrosData.map(item => item.total);
+
+        new Chart(document.getElementById("chartBairros"), {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        '#0d6efd', '#198754', '#fd7e14', '#6f42c1', '#ffc107',
+                        '#20c997', '#dc3545', '#6610f2', '#0dcaf0', '#adb5bd'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.label}: ${ctx.raw} leitores`
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>

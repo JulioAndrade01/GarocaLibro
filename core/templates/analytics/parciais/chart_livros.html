@@ -1,0 +1,39 @@
+<div class="chart-container mt-4">
+    <h5 class="mb-3 text-primary">📖 Livros mais emprestados</h5>
+    <canvas id="chartLivros"></canvas>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const livrosData = {{ top_livros|safe }};
+        const labels = livrosData.map(item => item.livro__nome);
+        const values = livrosData.map(item => item.total);
+
+        new Chart(document.getElementById("chartLivros"), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total de Empréstimos',
+                    data: values,
+                    backgroundColor: '#0d6efd',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.raw} empréstimo(s)`
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    });
+</script>

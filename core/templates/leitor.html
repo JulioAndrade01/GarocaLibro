@@ -1,87 +1,105 @@
-{% load django_bootstrap5 static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Leitor</title>
-    {% bootstrap_css %}
-    <link rel="stylesheet" href="{% static 'css/leitor.css' %}">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: "Poppins", sans-serif;
-        }
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .card-header {
-            background: linear-gradient(90deg, #0d6efd, #0b5ed7);
-            color: white;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #0d6efd;
-        }
-        .btn-primary {
-            border-radius: 8px;
-            padding: 10px 25px;
-        }
-        .btn-outline-secondary {
-            border-radius: 8px;
-            padding: 10px 25px;
-        }
-    </style>
-</head>
+{% extends 'base.html' %}
+{% load static %}
 
-<body>
-    <div class="container mt-5">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow-sm">
-                <div class="card-header text-center">
-                    <h3 class="mb-0">📘 Cadastro de Leitor</h3>
+{% block title %}
+{% if form.instance.pk %}
+Editar Leitor — {{ form.instance.nome }}
+{% else %}
+Novo Leitor
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                {% if form.instance.pk %}
+                ✏️ Editar Leitor
+                {% else %}
+                ➕ Novo Leitor
+                {% endif %}
+            </h4>
+            <a href="{% url 'leitor-list' %}" class="btn btn-light btn-sm">
+                ← Voltar para lista
+            </a>
+        </div>
+
+        <div class="card-body bg-light p-4">
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <!-- Nome e Email -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nome completo</label>
+                        {{ form.nome }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <!-- Telefone e CPF -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Telefone</label>
+                        {{ form.telefone }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">CPF</label>
+                        {{ form.cpf }}
+                    </div>
+
+                    <!-- Endereço e Bairro -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Endereço</label>
+                        {{ form.endereco }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Bairro</label>
+                        {{ form.bairro }}
+                    </div>
+
+                    <!-- Foto de Perfil -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Foto de Perfil</label>
+                        {{ form.foto_perfil }}
+                        {% if form.instance.foto_perfil %}
+                        <div class="mt-2">
+                            <img src="{{ form.instance.foto_perfil.url }}" 
+                                 alt="Foto atual" 
+                                 class="rounded shadow-sm border" 
+                                 style="width: 100px; height: 100px; object-fit: cover;">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Senha -->
+                    {% if form.password %}
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Senha</label>
+                        {{ form.password }}
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="card-body">
-                    {% bootstrap_messages %}
-                    
-                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="id_nome" class="form-label">Nome completo</label>
-                                <input type="text" name="nome" id="id_nome" class="form-control" placeholder="Digite o nome" value="{{ form.nome.value|default:'' }}" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="id_email" class="form-label">E-mail</label>
-                                <input type="email" name="email" id="id_email" class="form-control" placeholder="Digite o e-mail" value="{{ form.email.value|default:'' }}" required>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="id_telefone" class="form-label">Telefone</label>
-                                <input type="text" name="telefone" id="id_telefone" class="form-control" placeholder="(DDD) 99999-9999" value="{{ form.telefone.value|default:'' }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="id_password" class="form-label">Senha</label>
-                                <input type="password" name="password" id="id_password" class="form-control" placeholder="Digite uma senha segura">
-                            </div>
-                        </div>
-
-                        <div class="mt-4 d-flex justify-content-between">
-                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
-                            <button type="submit" class="btn btn-primary">💾 Salvar</button>
-                        </div>
-                    </form>
+                <!-- Botão -->
+                <div class="mt-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                        💾 Salvar Alterações
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#id_cpf').mask('000.000.000-00');
+    });
+</script>
+{% endblock %}
 
-    {% bootstrap_javascript %}
-</body>
-</html>

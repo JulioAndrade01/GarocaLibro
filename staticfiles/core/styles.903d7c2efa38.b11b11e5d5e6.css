@@ -1,0 +1,178 @@
+/* ===============================
+   🌅 ESTILO GERAL DA PÁGINA INICIAL
+   =============================== */
+
+body {
+    font-family: 'Poppins', 'Arial', sans-serif;
+    background-image: url("/static/core/cp.101bb82d9d26.101bb82d9d26.jpg"); /* Fundo com imagem personalizada */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #2c3e50;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===============================
+   🏠 CONTAINER PRINCIPAL
+   =============================== */
+
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 40px 30px;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    backdrop-filter: blur(4px);
+}
+
+/* ===============================
+   ✨ TÍTULO PRINCIPAL
+   =============================== */
+
+h1 {
+    font-size: 2.8em;
+    margin-bottom: 25px;
+    color: #1f3a93;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ===============================
+   🧍 PERFIL E IMAGEM
+   =============================== */
+
+.perfil-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.foto-perfil {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #3498db;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.informacoes p {
+    margin: 6px 0;
+    font-size: 1.1em;
+    color: #34495e;
+}
+
+/* ===============================
+   🔘 BOTÕES
+   =============================== */
+
+button, a {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    margin: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    display: inline-block;
+    outline: none;
+}
+
+button:hover, a:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+button:focus, a:focus {
+    outline: none;
+}
+
+/* ===============================
+   ✏️ FORMULÁRIOS
+   =============================== */
+
+form {
+    margin: 20px 0;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* ===============================
+   📱 RESPONSIVIDADE
+   =============================== */
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    .container {
+        padding: 25px 15px;
+    }
+
+    .perfil-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .foto-perfil {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+
+    button, a {
+        width: 100%;
+        font-size: 1em;
+    }
+}
+
+/* ===============================
+   🌟 ANIMAÇÃO SUAVE NA ENTRADA
+   =============================== */
+
+.container {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}

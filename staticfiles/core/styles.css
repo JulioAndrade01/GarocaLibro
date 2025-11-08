@@ -4,10 +4,11 @@
 
 body {
     font-family: 'Poppins', 'Arial', sans-serif;
-    background-image: url('/static/core/cp.jpg'); /* Fundo com imagem personalizada */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-image: url("../img/cp.jpg"); /* Caminho corrigido */
+    background-size: cover; /* Cobre toda a tela */
+    background-position: center center; /* Centraliza o foco */
+    background-repeat: no-repeat; /* Impede duplicação da imagem */
+    background-attachment: fixed; /* Evita bug de repetição em scroll */
     color: #2c3e50;
     margin: 0;
     padding: 0;
@@ -17,6 +18,7 @@ body {
     justify-content: center;
     align-items: center;
 }
+
 
 /* ===============================
    🏠 CONTAINER PRINCIPAL

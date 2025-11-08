@@ -1,0 +1,152 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}📊 Painel Analítico - Garoca Libro{% endblock %}
+
+{% block extrastyle %}
+<style>
+    /* Container principal */
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        animation: fadeIn 0.4s ease-in-out;
+        color: #212529; /* texto padrão escuro */
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cabeçalho */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-header h2 {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    /* Grid e cards */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .dashboard-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        padding: 20px;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    .dashboard-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        background-color: #ffffff;
+    }
+
+    .dashboard-card .icon {
+        font-size: 2.3rem;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-card h4 {
+        color: #0d6efd;
+        margin-bottom: 5px;
+    }
+
+    .dashboard-card p {
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .dashboard-card a {
+        margin-top: 10px;
+        display: inline-block;
+        color: white !important;
+        background-color: #0d6efd;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        text-decoration: none;
+    }
+
+    .dashboard-card a:hover {
+        background-color: #0b5ed7;
+    }
+
+    /* Rodapé e tempo */
+    .footer-note {
+        margin-top: 30px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .update-time {
+        text-align: right;
+        color: #495057;
+        font-size: 0.9rem;
+        margin-top: -10px;
+    }
+
+    /* Compatibilidade com modo escuro */
+    @media (prefers-color-scheme: dark) {
+        body, .dashboard-container {
+            color: #f1f1f1;
+        }
+        .dashboard-card {
+            background: #1e1e1e;
+            border: 1px solid #343a40;
+        }
+        .dashboard-card p {
+            color: #d1d1d1;
+        }
+        .dashboard-card h4 {
+            color: #66b2ff;
+        }
+        .footer-note, .update-time {
+            color: #bbb;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+        <h2>📊 Painel Analítico - Garoca Libro</h2>
+        <div class="update-time">⏱️ Última atualização: {{ current_time }}</div>
+    </div>
+
+    <p class="text-muted mb-4">
+        Bem-vindo ao painel analítico! Aqui você pode visualizar indicadores e relatórios do sistema Garoca Libro.
+    </p>
+
+    <div class="dashboard-grid">
+        {% for item in dashboards %}
+        <div class="dashboard-card">
+            <div class="icon">{{ item.icon }}</div>
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.desc }}</p>
+            <a href="{{ item.url }}">Acessar</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="footer-note">
+        📘 Dados atualizados automaticamente a partir do sistema Garoca Libro.
+    </div>
+</div>
+{% endblock %}

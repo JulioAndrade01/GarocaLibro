@@ -1,23 +1,45 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Perfil</title>
-    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Editar Perfil</h1>
-        <form method="post" enctype="multipart/form-data" class="form-group">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        </form>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+
+{% block title %}Editar Perfil - Garoca Libro{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 p-4 bg-white rounded shadow-sm" style="max-width: 700px;">
+    <h2 class="text-center text-primary mb-4">👤 Editar Perfil</h2>
+
+    {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-center" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="form-group">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">💾 Salvar Alterações</button>
+            <a href="{% url 'perfil' %}" class="btn btn-secondary px-4 ml-2">↩ Voltar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .form-group label {
+        font-weight: 600;
+    }
+    input[type="file"] {
+        border: none;
+    }
+</style>
+{% endblock %}

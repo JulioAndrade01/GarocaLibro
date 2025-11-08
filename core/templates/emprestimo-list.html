@@ -1,12 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Lista de Emprestimos</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <!-- 🔹 Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-journal-text me-2"></i>Empréstimos
+        </h2>
+        <a href="{% url 'emprestimo-create' %}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle"></i> Novo Empréstimo
+        </a>
+    </div>
+
+    <!-- 🔹 Tabela de Empréstimos -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-book me-2"></i>Lista de Empréstimos</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th>#</th>
+                        <th>Leitor</th>
+                        <th>Livro</th>
+                        <th>Data Empréstimo</th>
+                        <th>Data Devolução</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if emprestimos %}
+                        {% for emprestimo in emprestimos %}
+                        <tr class="text-center">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ emprestimo.leitor.nome }}</td>
+                            <td>{{ emprestimo.livro.nome }}</td>
+                            <td>{{ emprestimo.issue_date|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if emprestimo.devolucao %}
+                                    {{ emprestimo.devolucao|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if emprestimo.status == 'in_progress' %}
+                                    <span class="badge bg-warning text-dark">Em andamento</span>
+                                {% elif emprestimo.status == 'completed' %}
+                                    <span class="badge bg-success">Finalizado</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Indefinido</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <!-- Botão Editar -->
+                                    <a href="{% url 'emprestimo-edit' emprestimo.id %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+
+                                    <!-- Botão Excluir -->
+                                    <a href="{% url 'emprestimo-delete' emprestimo.id %}" 
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                Nenhum empréstimo cadastrado ainda.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

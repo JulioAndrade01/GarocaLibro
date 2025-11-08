@@ -1,37 +1,120 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load django_bootstrap5 %}
+
+{% block title %}
+{% if form.instance.pk %}
+Editar Livro — {{ form.instance.nome }}
+{% else %}
+Novo Livro
+{% endif %}
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">{% if object %}Editar{% else %}Novo{% endif %} Livro</h2>
-                </div>
-                <div class="card-body">
-                    {% bootstrap_messages %}
-                    
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% bootstrap_form form %}
-                        
-                        {% if object and object.capa %}
-                            <div class="mb-3">
-                                <label class="form-label">Capa Atual:</label>
-                                <img src="{{ object.capa.url }}" alt="Capa do livro {{ object.nome }}" class="img-thumbnail" style="max-height: 200px;">
-                            </div>
-                        {% endif %}
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Salvar</button>
-                            <a href="{% url 'livro-list' %}" class="btn btn-secondary">Cancelar</a>
+<div class="container mt-5 mb-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                {% if form.instance.pk %}
+                ✏️ Editar Livro
+                {% else %}
+                ➕ Novo Livro
+                {% endif %}
+            </h4>
+            <a href="{% url 'livro-list' %}" class="btn btn-light btn-sm">
+                ← Voltar para lista
+            </a>
+        </div>
+
+        <div class="card-body bg-light p-4">
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Código</label>
+                        {{ form.codigo }}
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Nome do Livro</label>
+                        {{ form.nome }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Autor</label>
+                        {{ form.autor }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Categoria</label>
+                        {{ form.categoria }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ano de Publicação</label>
+                        {{ form.ano_publicacao }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ISBN</label>
+                        {{ form.isbn }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">📘 Capa do Livro</label>
+                        {{ form.capa }}
+                        {% if form.instance.capa %}
+                        <div class="mt-2">
+                            <img src="{{ form.instance.capa.url }}" 
+                                 alt="Capa atual" 
+                                 class="rounded shadow-sm border" 
+                                 style="width: 100px; height: 140px; object-fit: cover;">
                         </div>
-                    </form>
+                        {% endif %}
+                        <div id="preview-container" class="mt-3" style="display:none;">
+                            <p class="small text-muted mb-1">Pré-visualização da nova imagem:</p>
+                            <img id="preview-image" class="rounded shadow-sm border"
+                                 style="width: 100px; height: 140px; object-fit: cover;">
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <div class="mt-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                        💾 Salvar Livro
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- 🖼️ Script para pré-visualizar a imagem da capa -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const input = document.querySelector("input[name='capa']");
+    const previewContainer = document.getElementById("preview-container");
+    const previewImage = document.getElementById("preview-image");
+
+    if (input) {
+        input.addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.style.display = "none";
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

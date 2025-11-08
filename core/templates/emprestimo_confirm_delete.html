@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white">
+            <h4><i class="bi bi-trash me-2"></i>Confirmar Exclusão</h4>
+        </div>
+        <div class="card-body text-center">
+            <p class="fs-5 mb-4">
+                Deseja realmente excluir o empréstimo de 
+                <strong>{{ object.livro.nome }}</strong> para 
+                <strong>{{ object.leitor.nome }}</strong>?
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="bi bi-check-lg"></i> Sim, excluir
+                </button>
+                <a href="{% url 'emprestimo-list' %}" class="btn btn-secondary">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

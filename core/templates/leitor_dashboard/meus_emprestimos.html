@@ -1,46 +1,111 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Empréstimos</title>
-    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <h2>📚 Meus Empréstimos</h2>
-        <a href="{% url 'dashboard_leitor' %}" class="btn btn-secondary">⬅ Voltar</a>
-        <table>
-            <thead>
-                <tr>
-                    <th>Livro</th>
-                    <th>Data de Empréstimo</th>
-                    <th>Data de Devolução</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for emprestimo in emprestimos %}
-                <tr>
-                    <td>{{ emprestimo.livro.nome }}</td>
-                    <td>{{ emprestimo.criado|date:"d/m/Y" }}</td>
-                    <td>{{ emprestimo.devolucao|date:"d/m/Y" }}</td>
-                    <td>
-                        {% if emprestimo.status == "completed" %}
-                            ✅ Devolvido
-                        {% else %}
-                            🔄 Em andamento
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4">Você ainda não possui empréstimos.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+{% block title %}📚 Meus Empréstimos — Garoca Libro{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 fade-in">
+    
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h2 class="page-title mb-1 text-primary">📚 Meus Empréstimos</h2>
+            <p class="text-muted mb-0">Veja seus livros emprestados e devoluções</p>
+        </div>
+        <a href="{% url 'dashboard_leitor' %}" class="btn btn-outline-primary shadow-sm mt-2">
+            ← Voltar ao Painel
+        </a>
     </div>
-</body>
-</html>
+
+    <!-- Caso não tenha empréstimos -->
+    {% if not emprestimos %}
+        <div class="alert alert-info text-center shadow-sm mt-4">
+            <h5>📭 Nenhum empréstimo encontrado.</h5>
+            <p>Você ainda não possui livros emprestados.</p>
+        </div>
+    {% else %}
+
+        <!-- Lista de empréstimos -->
+        <div class="row g-4">
+            {% for e in emprestimos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm border-0 h-100 rounded-4">
+                        <div class="card-body d-flex flex-column justify-content-between p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if e.livro.capa %}
+                                    <img src="{{ e.livro.capa.url }}" 
+                                         alt="{{ e.livro.nome }}"
+                                         class="rounded shadow-sm me-3"
+                                         style="width: 70px; height: 100px; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'img/default_book.png' %}" 
+                                         alt="Capa padrão" 
+                                         class="rounded shadow-sm me-3" 
+                                        style="width: 70px; height: 100px; object-fit: cover;">
+                                {% endif %}
+                                
+                                <div>
+                                    <h5 class="text-primary mb-1">{{ e.livro.nome }}</h5>
+                                    <p class="text-muted mb-0"><small>por {{ e.livro.autor }}</small></p>
+                                </div>
+                            </div>
+
+                            <ul class="list-unstyled small text-muted mb-3">
+                                <li>📅 <strong>Empréstimo:</strong> {{ e.issue_date|date:"d/m/Y" }}</li>
+                                <li>📆 <strong>Devolução:</strong> 
+                                    {% if e.devolucao %}
+                                        {{ e.devolucao|date:"d/m/Y" }}
+                                    {% else %}
+                                        <span class="text-secondary">Não definida</span>
+                                    {% endif %}
+                                </li>
+                                <li>📖 <strong>Status:</strong>
+                                    {% if e.status == 'in_progress' %}
+                                        <span class="badge bg-warning text-dark">Em andamento</span>
+                                    {% elif e.status == 'completed' %}
+                                        <span class="badge bg-success">Finalizado</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Desconhecido</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+
+                            {% if e.status == 'in_progress' %}
+                                <div class="d-flex justify-content-end">
+                                    <a href="{% url 'devolver_livro' %}" class="btn btn-outline-success btn-sm">
+                                        📘 Devolver Livro
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% endif %}
+</div>
+
+<style>
+.fade-in { animation: fadeIn 0.5s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.page-title {
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.6em;
+}
+</style>
+{% endblock %}

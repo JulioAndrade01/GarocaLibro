@@ -22,15 +22,15 @@ class LeitorModelForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Senha'
+            'placeholder': 'Senha (preencha apenas se desejar alterar)'
         }),
-        required=True,
+        required=False,  # ← não obriga preencher senha ao editar
         label="Senha"
     )
 
     class Meta:
         model = Leitor
-        fields = ['nome', 'telefone', 'email', 'password', 'foto_perfil', 'endereco']  # Added foto_perfil and endereco
+        fields = ['nome', 'telefone', 'cpf', 'email', 'password', 'foto_perfil', 'endereco', 'bairro']
         widgets = {
             'nome': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -40,41 +40,63 @@ class LeitorModelForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Telefone do Leitor'
             }),
+            'cpf': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'CPF (000.000.000-00)',
+                'data-mask': '000.000.000-00'
+            }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Email do Leitor'
             }),
             'foto_perfil': forms.FileInput(attrs={
                 'class': 'form-control',
-                'accept': 'image/*'  # Only accept image files
+                'accept': 'image/*'
             }),
             'endereco': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Endereço do Leitor'
             }),
+            'bairro': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Bairro'
+            }),
         }
 
     def clean_email(self):
-        """Valida o e-mail para garantir que não esteja em uso."""
+        """Evita duplicação de e-mails apenas quando for novo leitor."""
         email = self.cleaned_data.get('email')
-        if Leitor.objects.filter(email=email).exists():
-            raise ValidationError("Este email já está cadastrado.")
+        if self.instance and self.instance.pk:
+            # Ignora o próprio leitor na validação
+            if Leitor.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+                raise ValidationError("Este email já está cadastrado em outro usuário.")
+        else:
+            if Leitor.objects.filter(email=email).exists():
+                raise ValidationError("Este email já está cadastrado.")
         return email
 
     def save(self, commit=True):
-        """Salva o Leitor com a senha criptografada."""
+        """Salva o leitor e atualiza a senha apenas se for informada."""
         leitor = super().save(commit=False)
-        leitor.set_password(self.cleaned_data['password'])  # Criptografa a senha
+        password = self.cleaned_data.get('password')
+
+        # Só altera a senha se o campo for preenchido
+        if password:
+            leitor.set_password(password)
+
         if commit:
             leitor.save()
+
         return leitor
+
+
 
 class LivroModelForm(forms.ModelForm):
     """Formulário para criar ou editar um Livro."""
     
     class Meta:
         model = Livro
-        fields = ['codigo', 'nome', 'categoria', 'autor', ]
+        fields = ['codigo', 'nome', 'autor', 'categoria', 'ano_publicacao', 'isbn', 'status', 'capa']
         widgets = {
             'codigo': forms.TextInput(attrs={
                 'class': 'form-control',

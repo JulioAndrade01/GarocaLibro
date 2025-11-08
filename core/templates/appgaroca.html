@@ -5,29 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GaroçáLibro</title>
-    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
+            background-image: url('https://garoca1.s3.us-east-2.amazonaws.com/media/cp.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: #333;
             text-align: center;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .hero {
-            position: relative;
-            background-image: url('https://garoca1.s3.us-east-2.amazonaws.com/media/cp.jpg');
-            background-size: cover;
-            background-position: center;
+            background: transparent;
             height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
-            text-shadow: 1px 1px 8px rgba(0,0,0,0.6);
+            color: #ffffff;
+            text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.6);
         }
 
         .hero h1 {
@@ -62,6 +68,8 @@
             color: white;
             padding: 10px 0;
             font-size: 0.9rem;
+            width: 100%;
+            text-align: center;
         }
 
         @media (max-width: 768px) {

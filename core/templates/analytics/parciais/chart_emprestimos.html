@@ -1,0 +1,35 @@
+<div class="chart-container mt-4">
+    <h5 class="mb-3 text-primary">📅 Empréstimos por mês</h5>
+    <canvas id="chartEmprestimosMensais"></canvas>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const emprestimosData = {{ emprestimos_mensais|safe }};
+        const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const labels = emprestimosData.map(item => meses[parseInt(item.month) - 1]);
+        const values = emprestimosData.map(item => item.total);
+
+        new Chart(document.getElementById("chartEmprestimosMensais"), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Empréstimos Mensais',
+                    data: values,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>

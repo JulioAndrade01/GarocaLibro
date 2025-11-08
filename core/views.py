@@ -1,25 +1,35 @@
 import logging
 from datetime import datetime, date
-from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView
+from io import BytesIO
+import pandas as pd
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, Alignment, PatternFill
+
+from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView, ListView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils.timezone import make_aware
-from core.forms import LoginForm, LeitorModelForm, AgendamentoForm, LivroModelForm
-from core.models import Emprestimo, Leitor, Livro, Agendamento
 from django.views.decorators.http import require_POST
+from django.db.models import Count
 
-# Configura o logger
+from core.forms import LoginForm, LeitorModelForm, AgendamentoForm, LivroModelForm
+from core.models import Emprestimo, Leitor, Livro, Agendamento, Noticia
+
+# ===========================================
+# 🔹 CONFIGURAÇÃO DE LOG
+# ===========================================
 logger = logging.getLogger(__name__)
 
 # ===========================================
 # 🔹 HOME E APP PRINCIPAL
 # ===========================================
-def home_view(request):
-    return render(request, 'home.html')
+def home(request):
+    noticias = Noticia.objects.filter(ativo=True).order_by('-criado_em')[:5]
+    return render(request, 'home.html', {'noticias': noticias})
 
 
 class AppGarocaView(TemplateView):
@@ -29,8 +39,11 @@ class AppGarocaView(TemplateView):
 # ===========================================
 # 🔹 CRUD: LEITOR
 # ===========================================
-class LeitorListView(TemplateView):
+class LeitorListView(ListView):
+    model = Leitor
     template_name = 'leitor-list.html'
+    context_object_name = 'leitores'
+    ordering = ['nome']
 
 
 class LeitorCreateView(CreateView):
@@ -47,6 +60,7 @@ class LeitorUpdateView(UpdateView):
     success_url = reverse_lazy('leitor-list')
 
 
+
 class LeitorDeleteView(DeleteView):
     model = Leitor
     template_name = 'leitor_confirm_delete.html'
@@ -58,6 +72,11 @@ class LeitorDeleteView(DeleteView):
 # ===========================================
 class LivroListView(TemplateView):
     template_name = 'livro-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['livros'] = Livro.objects.all().order_by('nome')
+        return context
 
 
 class LivroCreateView(CreateView):
@@ -81,22 +100,21 @@ class LivroDeleteView(DeleteView):
 
 
 # ===========================================
-# 🔹 LISTAGEM SIMPLES DE LIVROS (RESTAURADA)
+# 🔹 LISTAGEM SIMPLES DE LIVROS
 # ===========================================
 def livros_view(request):
-    """
-    Exibe uma lista simples de todos os livros disponíveis no sistema.
-    Essa view é pública e pode ser usada para o leitor visualizar o catálogo.
-    """
     livros = Livro.objects.all().order_by('nome')
     return render(request, 'livros.html', {'livros': livros})
 
 
 # ===========================================
-# 🔹 CRUD: EMPRÉSTIMO
+# 🔹 EMPRÉSTIMO
 # ===========================================
-class EmprestimoListView(TemplateView):
+class EmprestimoListView(ListView):
+    model = Emprestimo
     template_name = 'emprestimo-list.html'
+    context_object_name = 'emprestimos'
+    ordering = ['-criado']
 
 
 class EmprestimoCreateView(CreateView):
@@ -111,9 +129,30 @@ class EmprestimoCreateView(CreateView):
             form.instance.devolucao = make_aware(datetime.combine(devolucao, datetime.min.time()))
         return super().form_valid(form)
 
+class EmprestimoUpdateView(UpdateView):
+    model = Emprestimo
+    fields = ['livro', 'devolucao', 'status']
+    template_name = 'emprestimo.html'
+    success_url = reverse_lazy('emprestimo-list')
+
 
 # ===========================================
-# 🔹 AGENDAMENTOS / RESERVAS
+# 🔹 EXCLUSÃO DE EMPRÉSTIMO
+# ===========================================w
+
+class EmprestimoDeleteView(DeleteView):
+    model = Emprestimo
+    template_name = 'emprestimo_confirm_delete.html'
+    success_url = reverse_lazy('emprestimo-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Excluir Empréstimo"
+        context['mensagem'] = f"Deseja realmente excluir o empréstimo do livro '{self.object.livro.nome}'?"# type: ignore
+        return context
+
+# ===========================================
+# 🔹 AGENDAMENTOS
 # ===========================================
 @login_required
 def reservas_view(request):
@@ -124,27 +163,38 @@ def reservas_view(request):
 @login_required
 def agendar_retirada(request):
     livros_disponiveis = Livro.objects.filter(status=True)
-    if request.method == 'POST':
-        form = AgendamentoForm(request.POST)
-        if form.is_valid():
-            livro = form.cleaned_data['livro']
-            if livro.status:
-                agendamento = form.save(commit=False)
-                agendamento.leitor = request.user
-                agendamento.save()
-                livro.status = False
-                livro.save()
-                messages.success(request, f'Agendamento realizado com sucesso para o livro "{livro.nome}"!')
-                return redirect('dashboard_leitor')
-            else:
-                form.add_error('livro', 'Este livro já foi reservado.')
-    else:
-        form = AgendamentoForm()
-    return render(request, 'agendar_retirada.html', {'form': form, 'livros_list': livros_disponiveis})
 
+    if request.method == "POST":
+        livro_id = request.POST.get("livro")
+        data_agendada = request.POST.get("data_agendada")
 
-def success(request):
-    return render(request, 'success.html')
+        if not livro_id or not data_agendada:
+            messages.error(request, "Por favor, selecione um livro e uma data.")
+            return redirect("agendar_retirada")
+
+        livro = get_object_or_404(Livro, id=livro_id, status=True)
+        Agendamento.objects.create(
+            leitor=request.user,
+            livro=livro,
+            data_agendada=data_agendada,
+            status="scheduled",
+        )
+
+        livro.status = False
+        livro.save(update_fields=["status"])
+
+        messages.success(
+            request,
+            f"📚 Agendamento realizado com sucesso para o livro '{livro.nome}' em {data_agendada}!"
+        )
+        return redirect("dashboard_leitor")
+
+    context = {
+        "livros_list": livros_disponiveis,
+        "today": date.today().isoformat(),
+    }
+    return render(request, "agendar_retirada.html", context)
+
 
 @login_required
 @require_POST
@@ -157,7 +207,6 @@ def cancelar_agendamento(request, agendamento_id):
         agendamento.status = 'cancelled'
         agendamento.save()
 
-        # Libera o livro novamente
         agendamento.livro.status = True
         agendamento.livro.save()
 
@@ -165,6 +214,7 @@ def cancelar_agendamento(request, agendamento_id):
     except Exception as e:
         logger.error(f"Erro ao cancelar agendamento: {str(e)}")
         return JsonResponse({'error': 'Erro ao cancelar o agendamento.'}, status=500)
+
 
 # ===========================================
 # 🔹 LOGIN / CADASTRO / PERFIL
@@ -203,12 +253,8 @@ def login_view(request):
 
 @login_required
 def perfil_view(request):
-    try:
-        leitor = get_object_or_404(Leitor, email=request.user.email)
-        return render(request, 'perfil.html', {'leitor': leitor})
-    except Exception as e:
-        logger.error(f"Erro ao carregar o perfil: {str(e)}")
-        return render(request, 'erro.html', {'mensagem': 'Erro ao carregar o perfil.'})
+    leitor = get_object_or_404(Leitor, email=request.user.email)
+    return render(request, 'perfil.html', {'leitor': leitor})
 
 
 @login_required
@@ -241,20 +287,21 @@ def editar_perfil_ajax(request):
             leitor.foto_perfil = foto
 
         leitor.save()
+
         return JsonResponse({
             "success": True,
-            "foto_perfil": leitor.foto_perfil.url if leitor.foto_perfil else "https://garoca1.s3.us-east-2.amazonaws.com/media/default-profile.png"
+            "foto_perfil": leitor.foto_perfil.url if leitor.foto_perfil else "/static/img/default-profile.png"
         })
-    return JsonResponse({"success": False}, status=400)
+
+    return JsonResponse({"success": False, "error": "Requisição inválida."}, status=400)
 
 
 # ===========================================
-# 🔹 DASHBOARD DO LEITOR
+# 🔹 DASHBOARD LEITOR
 # ===========================================
 @login_required
 def dashboard_leitor(request):
     leitor = request.user
-
     emprestimos = Emprestimo.objects.filter(leitor=leitor).order_by('-criado')
     agendamentos = Agendamento.objects.filter(leitor=leitor).order_by('-criado')
 
@@ -267,8 +314,40 @@ def dashboard_leitor(request):
 
 
 # ===========================================
+# 🔹 MEUS EMPRÉSTIMOS
+# ===========================================
+@login_required
+def meus_emprestimos(request):
+    emprestimos = Emprestimo.objects.filter(leitor=request.user).order_by('-criado')
+    return render(request, 'leitor_dashboard/meus_emprestimos.html', {'emprestimos': emprestimos})
+
+
+# ===========================================
 # 🔹 DEVOLUÇÃO DE LIVROS
 # ===========================================
+@login_required
+def devolver_livro_view(request):
+    if request.method == 'POST':
+        codigo_livro = request.POST.get('codigo_livro')
+        try:
+            livro = get_object_or_404(Livro, codigo=codigo_livro)
+            emprestimo = get_object_or_404(Emprestimo, livro=livro, status='in_progress')
+            emprestimo.status = 'completed'
+            emprestimo.save()
+            livro.status = True
+            livro.save()
+            messages.success(request, f'📚 Livro "{livro.nome}" devolvido com sucesso!')
+            return redirect('devolver_livro')
+        except Livro.DoesNotExist:
+            messages.error(request, 'Código do livro não encontrado.')
+        except Emprestimo.DoesNotExist:
+            messages.error(request, 'Este livro não está emprestado.')
+        except Exception as e:
+            logger.error(f"Erro ao processar devolução: {str(e)}")
+            messages.error(request, 'Erro ao processar devolução.')
+    return render(request, 'devolver_livro.html')
+
+
 @login_required
 def api_devolver_livro(request, emprestimo_id):
     try:
@@ -285,40 +364,153 @@ def api_devolver_livro(request, emprestimo_id):
 
         return JsonResponse({'message': 'Livro devolvido com sucesso!'})
     except Exception as e:
-        logger.error(f"Erro ao processar devolução do livro: {str(e)}")
-        return JsonResponse({'error': 'Erro ao processar a devolução.'}, status=500)
+        logger.error(f"Erro ao processar devolução via API: {str(e)}")
+        return JsonResponse({'error': 'Erro ao processar devolução.'}, status=500)
 
 
-@login_required
-def devolver_livro_view(request):
-    if request.method == 'POST':
-        codigo_livro = request.POST.get('codigo_livro')
-        try:
-            livro = get_object_or_404(Livro, codigo=codigo_livro)
-            emprestimo = get_object_or_404(Emprestimo, livro=livro, status='in_progress')
-            emprestimo.status = 'completed'
-            emprestimo.save()
-            livro.status = True
-            livro.save()
-            messages.success(request, f'Livro "{livro.nome}" devolvido com sucesso!')
-            return redirect('devolver_livro')
-        except Livro.DoesNotExist:
-            messages.error(request, 'Código do livro não encontrado.')
-        except Emprestimo.DoesNotExist:
-            messages.error(request, 'Este livro não está emprestado.')
-        except Exception as e:
-            logger.error(f"Erro ao processar devolução: {str(e)}")
-            messages.error(request, 'Erro ao processar devolução.')
-    return render(request, 'devolver_livro.html')
 # ===========================================
-# 🔹 MEUS EMPRÉSTIMOS (PARA O LEITOR LOGADO)
+# 📊 ANALYTICS (ADMIN)
 # ===========================================
-@login_required
-def meus_emprestimos(request):
-    """
-    Exibe todos os empréstimos feitos pelo leitor logado.
-    Mostra tanto os ativos quanto os finalizados.
-    """
-    emprestimos = Emprestimo.objects.filter(leitor=request.user).order_by('-criado')
-    return render(request, 'leitor_dashboard/meus_emprestimos.html', {'emprestimos': emprestimos})
+@user_passes_test(lambda u: u.is_staff)
+def analytics_dashboard(request):
+    top_livros = Emprestimo.objects.values('livro__nome').annotate(total=Count('livro')).order_by('-total')[:10]
+    top_bairros = Leitor.objects.values('bairro').annotate(total=Count('id')).order_by('-total')[:10]
+    emprestimos_mensais = (
+        Emprestimo.objects.extra(select={'month': "strftime('%%m', criado)"})
+        .values('month').annotate(total=Count('id')).order_by('month')
+    )
+
+    context = {
+        'top_livros': list(top_livros),
+        'top_bairros': list(top_bairros),
+        'emprestimos_mensais': list(emprestimos_mensais),
+        'total_livros': Livro.objects.count(),
+        'total_leitores': Leitor.objects.count(),
+        'total_emprestimos': Emprestimo.objects.count(),
+        'total_bairros': Leitor.objects.values('bairro').distinct().count(),
+    }
+    return render(request, 'analytics/dashboard_admin.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def analytics_report(request):
+    bairros = Leitor.objects.values('bairro').exclude(bairro__isnull=True).distinct().order_by('bairro')
+    livros = Livro.objects.values('nome').order_by('nome')
+    return render(request, 'analytics/report.html', {'bairros': bairros, 'livros': livros})
+
+
+@user_passes_test(lambda u: u.is_staff)
+def filtrar_emprestimos(request):
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    bairro = request.GET.get('bairro')
+    livro = request.GET.get('livro')
+
+    emprestimos = Emprestimo.objects.select_related('livro', 'leitor')
+
+    if data_inicio:
+        emprestimos = emprestimos.filter(criado__gte=data_inicio)
+    if data_fim:
+        emprestimos = emprestimos.filter(criado__lte=data_fim)
+    if bairro:
+        emprestimos = emprestimos.filter(leitor__bairro=bairro)
+    if livro:
+        emprestimos = emprestimos.filter(livro__nome=livro)
+
+    resultados = [
+        {
+            'livro': e.livro.nome,
+            'leitor': e.leitor.nome,
+            'bairro': e.leitor.bairro,
+            'data_emprestimo': e.criado.strftime('%d/%m/%Y'),
+            'data_devolucao': e.devolucao.strftime('%d/%m/%Y') if e.devolucao else None,
+            'status': e.status,
+        }
+        for e in emprestimos
+    ]
+
+    return JsonResponse({'resultados': resultados})
+
+
+@user_passes_test(lambda u: u.is_staff)
+def insights_dashboard(request):
+    top_livros = Emprestimo.objects.values('livro__nome').annotate(total=Count('livro')).order_by('-total')[:5]
+    top_bairros = Leitor.objects.values('bairro').annotate(total=Count('id')).order_by('-total')[:5]
+    emprestimos_mensais = (
+        Emprestimo.objects.extra(select={'month': "strftime('%%m', criado)"})
+        .values('month').annotate(total=Count('id')).order_by('month')
+    )
+
+    context = {
+        'total_livros': Livro.objects.count(),
+        'total_leitores': Leitor.objects.count(),
+        'total_emprestimos': Emprestimo.objects.count(),
+        'total_bairros': Leitor.objects.values('bairro').distinct().count(),
+        'top_livros': list(top_livros),
+        'top_bairros': list(top_bairros),
+        'emprestimos_mensais': list(emprestimos_mensais),
+    }
+    return render(request, 'analytics/insights.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff) # type: ignore
+def exportar_relatorio_excel(request):
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    bairro = request.GET.get('bairro')
+    livro_nome = request.GET.get('livro')
+
+    emprestimos = Emprestimo.objects.select_related('livro', 'leitor')
+
+    if data_inicio:
+        emprestimos = emprestimos.filter(criado__gte=data_inicio)
+    if data_fim:
+        emprestimos = emprestimos.filter(criado__lte=data_fim)
+    if bairro:
+        emprestimos = emprestimos.filter(leitor__bairro=bairro)
+    if livro_nome:
+        emprestimos = emprestimos.filter(livro__nome=livro_nome)
+
+    if not emprestimos.exists():
+        messages.warning(request, "Nenhum registro encontrado com esses filtros.")
+        return redirect('analytics_report')
+
+    df = pd.DataFrame(list(emprestimos.values(
+        'livro__nome',
+        'leitor__nome',
+        'leitor__bairro',
+        'criado',
+        'devolucao',
+        'status'
+    )))
+
+    df.rename(columns={
+        'livro__nome': 'Livro',
+        'leitor__nome': 'Leitor',
+        'leitor__bairro': 'Bairro',
+        'criado': 'Data Empréstimo',
+        'devolucao': 'Data Devolução',
+        'status': 'Status'
+    }, inplace=True)
+
+    for coluna in ['Data Empréstimo', 'Data Devolução']:
+        df[coluna] = pd.to_datetime(df[coluna], errors='coerce')
+
+    df['Data Empréstimo'] = df['Data Empréstimo'].dt.strftime('%d/%m/%Y')
+    df['Data Devolução'] = df['Data Devolução'].dt.strftime('%d/%m/%Y')
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Empréstimos')
+        ws = writer.sheets['Empréstimos']
+
+        header_font = Font(bold=True, color="FFFFFF")
+        fill = PatternFill(start_color="0070C0", end_color="0070C0", fill_type="solid")
+
+        for col_num, column_title in enumerate(df.columns, 1):
+            cell = ws.cell(row=1, column=col_num)
+            cell.font = header_font
+            cell.fill = fill
+            cell.alignment = Alignment(horizontal="center")
+            ws.column_dimensions[get_column_letter(col_num)].width = max(len(column_title) + 5, 18)
 

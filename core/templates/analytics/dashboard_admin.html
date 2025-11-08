@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}📊 Painel de Análises - Garoca Libro{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4 text-primary">📊 Painel de Análises</h2>
+    <p class="text-muted">Resumo visual com indicadores e estatísticas do sistema Garoca Libro.</p>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">📈 Estatísticas Gerais</div>
+        <div class="card-body">
+            <p>Total de Livros: <strong>{{ total_livros|default:"0" }}</strong></p>
+            <p>Total de Leitores: <strong>{{ total_leitores|default:"0" }}</strong></p>
+            <p>Total de Empréstimos: <strong>{{ total_emprestimos|default:"0" }}</strong></p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">📚 Gráficos de Análise</div>
+        <div class="card-body">
+            <canvas id="graficoEmprestimos" height="100"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('graficoEmprestimos').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ meses|safe }},
+        datasets: [{
+            label: 'Empréstimos por Mês',
+            data: {{ valores|safe }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: { y: { beginAtZero: true } }
+    }
+});
+</script>
+{% endblock %}

@@ -7,9 +7,8 @@ import dotenv
 # ==============================
 # 🧩 CARREGAR VARIÁVEIS DE AMBIENTE
 # ==============================
-# Isso garante que o .env seja carregado automaticamente
 BASE_DIR = Path(__file__).resolve().parent.parent
-dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))  # ✅ corrigido: converte Path para string
+dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # ==============================
 # 🔐 CONFIGURAÇÕES DE SEGURANÇA
@@ -32,9 +31,10 @@ INSTALLED_APPS = [
     # Aplicações locais e externas
     'core',
     'django_bootstrap5',
-    'storages',  # Integração com AWS S3
-    'csp',       # Content Security Policy
+    'storages',
+    'csp',
     'django_extensions',
+    'widget_tweaks',
 ]
 
 # ==============================
@@ -137,10 +137,27 @@ USE_TZ = True
 # ==============================
 # 📦 ARQUIVOS ESTÁTICOS
 # ==============================
+
 STATIC_URL = '/static/'
+
+# Diretório onde estão seus arquivos CSS, JS e imagens
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Pasta onde o Django coletará os arquivos para o Whitenoise
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Whitenoise - compressão e cache inteligente
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_MAX_AGE = 31536000  # 1 ano de cache
+WHITENOISE_MAX_AGE = 31536000  # 1 ano
+
+# ==============================
+# 🖼️ ARQUIVOS DE MÍDIA (uploads)
+# ==============================
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ==============================
 # ☁️ AWS S3 CONFIG (UPLOADS)
@@ -150,7 +167,7 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'garoca1')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-2')
 AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
-AWS_QUERYSTRING_AUTH = False  # URLs permanentes
+AWS_QUERYSTRING_AUTH = False
 
 # 📁 Uploads e Mídia (S3 sempre ativo)
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
@@ -165,11 +182,11 @@ DEFAULT_CHARSET = 'utf-8'
 AUTH_USER_MODEL = 'core.Leitor'
 
 # ==============================
-# 🔐 LOGIN E SEGURANÇA
+# 🔐 LOGIN / LOGOUT / SEGURANÇA
 # ==============================
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/'  # ✅ Agora redireciona para a home.html
 
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
@@ -262,4 +279,3 @@ LOGGING = {
         },
     }
 }
-

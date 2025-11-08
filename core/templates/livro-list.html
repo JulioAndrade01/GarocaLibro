@@ -1,53 +1,71 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Lista de Livros{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Lista de Livros</h2>
-            <a href="{% url 'livro-create' %}" class="btn btn-light">Novo Livro</a>
-        </div>
-        <div class="card-body">
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for livro in object_list %}
-                    <div class="col">
-                        <div class="card h-100">
-                            {% if livro.capa %}
-                                <img src="{{ livro.capa.url }}" class="card-img-top" alt="Capa de {{ livro.nome }}" style="height: 200px; object-fit: cover;">
-                            {% else %}
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-book fa-3x text-muted"></i>
-                                </div>
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ livro.nome }}</h5>
-                                <p class="card-text">
-                                    <strong>Autor:</strong> {{ livro.autor }}<br>
-                                    <strong>Categoria:</strong> {{ livro.categoria }}<br>
-                                    <strong>Status:</strong> 
-                                    <span class="badge {% if livro.status %}bg-success{% else %}bg-danger{% endif %}">
-                                        {{ livro.get_status_display }}
-                                    </span>
-                                </p>
-                            </div>
-                            <div class="card-footer bg-transparent">
-                                <div class="btn-group w-100">
-                                    <a href="{% url 'livro-update' livro.pk %}" class="btn btn-outline-primary">Editar</a>
-                                    <a href="{% url 'livro-delete' livro.pk %}" class="btn btn-outline-danger">Excluir</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% empty %}
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            Nenhum livro cadastrado.
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold mb-0">📚 Lista de Livros</h2>
+        <a href="{% url 'livro-create' %}" class="btn btn-success shadow-sm">
+            ➕ Adicionar Livro
+        </a>
     </div>
+
+    {% if livros %}
+    <div class="table-responsive shadow-sm rounded-3">
+        <table class="table table-hover align-middle text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col">Capa</th>
+                    <th scope="col">Código</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Autor</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Ano</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livro in livros %}
+                <tr>
+                    <td>
+                        <img src="{{ livro.capa_url }}" alt="{{ livro.nome }}"
+                             class="img-thumbnail shadow-sm"
+                             style="width: 60px; height: 80px; object-fit: cover; border-radius: 6px;">
+                    </td>
+                    <td class="fw-semibold">{{ livro.codigo }}</td>
+                    <td>{{ livro.nome }}</td>
+                    <td>{{ livro.autor }}</td>
+                    <td>{{ livro.categoria.nome }}</td>
+                    <td>{{ livro.ano_publicacao|default:"—" }}</td>
+                    <td>
+                        {% if livro.status %}
+                            <span class="badge bg-success">Disponível</span>
+                        {% else %}
+                            <span class="badge bg-danger">Indisponível</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'livro-update' livro.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                            ✏️ Editar
+                        </a>
+                        <a href="{% url 'livro-delete' livro.pk %}" class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Tem certeza que deseja excluir este livro?')">
+                            🗑️ Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center mt-4 shadow-sm">
+        <strong>Nenhum livro encontrado.</strong><br>
+        Cadastre o primeiro clicando em <span class="text-primary fw-bold">“Adicionar Livro”</span>.
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
